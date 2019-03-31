@@ -86,9 +86,11 @@ namespace AssignmentOne_Pigeon_Sim
             string textureFile = "Maya/sourceimages/skybox_diffuse";
             Vector3 positionSkyBox = new Vector3(0, 0, 0);
             Vector3 rotationSkyBox = new Vector3(0, 0, 0);
+            Vector3 AABBOffset = new Vector3(0, 0, 0);
             float scaleSkyBox = 0.5f;
-            // Plot plotSkyBox = new Plot(Content, modelFile, textureFile, positionSkyBox, rotationSkyBox, scaleSkyBox);
-            // plotList.Add(plotSkyBox);
+            Plot plotSkyBox = new Plot(Content, modelFile, textureFile, positionSkyBox, rotationSkyBox, scaleSkyBox, 
+                                        AABBOffset);
+            plotList.Add(plotSkyBox);
 
             for (int ii = 0; ii < sizeX; ii++)
             {
