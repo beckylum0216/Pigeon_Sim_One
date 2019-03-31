@@ -16,7 +16,6 @@ namespace AssignmentOne_Pigeon_Sim
         {
             this.modelPath = modelFile;
             this.texturePath = textureFile;
-
             this.actorModel = Content.Load<Model>(modelPath);
             this.actorTexture = Content.Load<Texture2D>(texturePath);
             this.actorPosition = inputPosition;
@@ -46,15 +45,14 @@ namespace AssignmentOne_Pigeon_Sim
             return (float)(inputDegrees * (Math.PI / 180));
         }
 
-        public override Matrix ActorInit()
+        public Matrix ActorInit()
         {
 
             float scale = 0.25f;
             float radianX = ActorRadians(0);
             float radianY = ActorRadians(0);
             float radianZ = ActorRadians(0);
-
-
+            
             Matrix objScale = Matrix.CreateScale(scale);
             Matrix objTranslate = Matrix.CreateTranslation(0, 0, 0);
             Matrix objRotateX = Matrix.CreateRotationX(radianX);
@@ -66,12 +64,10 @@ namespace AssignmentOne_Pigeon_Sim
             return objPosition;
         }
 
-        public override bool ActorCollider()
+        public override bool AABBtoAABB(Actor targetActor)
         {
             return false;
         }
-
         
-
     }
 }

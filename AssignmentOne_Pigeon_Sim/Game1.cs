@@ -27,8 +27,11 @@ namespace AssignmentOne_Pigeon_Sim
 
         public Game1()
         {
+            
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            graphics.IsFullScreen = true;
+            graphics.HardwareModeSwitch = false;
         }
 
         /// <summary>
@@ -39,7 +42,6 @@ namespace AssignmentOne_Pigeon_Sim
         /// </summary>
         protected override void Initialize()
         {
-            
 
             int screenX = GraphicsDevice.Viewport.Width;
             int screenY = GraphicsDevice.Viewport.Height;
@@ -50,20 +52,15 @@ namespace AssignmentOne_Pigeon_Sim
             int centerX = (int)(screenX / 2);
             int centerY = (int)(screenY / 2);
 
-            // monogame bug the cursor will not center in full screen mode
-            // problem is here
-            graphics.ToggleFullScreen();
-
-
             projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), screenX / screenY, 0.1f, 1000f);
 
             mapClient = new PlotClient(Content, 11, 11, 1.0f);
+            mapClient.SetPlotDictionary();
             mapClient.SetPlotList();
             mapClient.PrintPlotList();
 
             this.IsMouseVisible = true;
-
-
+            
             camEyeVector = new Vector3(0, 0, 0);
             Debug.WriteLine("camEyeVector" + camEyeVector.X + " " + camEyeVector.Y + " " + camEyeVector.Z);
             camPositionVector = Vector3.Add(new Vector3(50, 0, 0), new Vector3(0, 1.6f, 0));
@@ -163,13 +160,14 @@ namespace AssignmentOne_Pigeon_Sim
 
             if(direction == InputHandler.Direction.Forwards)
             {
-
+                //getting the invers of the rotation vector
                 Quaternion inverseQuaternion = Quaternion.Inverse(new Quaternion(deltaVector.X, deltaVector.Y, deltaVector.Z, 0));
+                // removing the  quaternion rotation and getting the "front" heading
                 Vector3 tempDeltaVector = deltaVector * new Vector3(inverseQuaternion.X, inverseQuaternion.Y, inverseQuaternion.Z);
-                camPositionVector -= 3f * tempDeltaVector;
-                //camPositionVector += 5 * tempDeltaVector;
-
-                //camPositionVector *=  - 5 * Vector3.Cross(Vector3.Up, deltaVector);
+                // using the "front" heading and translating it;
+                //camPositionVector -= 3f * tempDeltaVector;
+                
+                camPositionVector += 3f * deltaVector;
 
                 Debug.WriteLine("position Vector: " + camPositionVector.X + " " + camPositionVector.Y + " " + camPositionVector.Z);
             }
@@ -177,10 +175,11 @@ namespace AssignmentOne_Pigeon_Sim
             if(direction == InputHandler.Direction.Backwards)
             {
                 Quaternion inverseQuaternion = Quaternion.Inverse(new Quaternion(deltaVector.X, deltaVector.Y, deltaVector.Z, 0));
-                Vector3 tempDeltaVector = deltaVector * new Vector3(inverseQuaternion.X, inverseQuaternion.Y, inverseQuaternion.Z);
-                camPositionVector += 3f * tempDeltaVector;
+                Vector3 tempDeltaVector = Vector3.Cross( deltaVector, new Vector3(inverseQuaternion.X, inverseQuaternion.Y, inverseQuaternion.Z));
+                //camPositionVector += 3f * tempDeltaVector;
 
-                // camPositionVector *= 5 * Vector3.Cross(Vector3.Up, deltaVector);
+                camPositionVector -= 3f * deltaVector;
+
                 Debug.WriteLine("position Vector: " + camPositionVector.X + " " + camPositionVector.Y + " " + camPositionVector.Z);
             }
 
@@ -188,7 +187,6 @@ namespace AssignmentOne_Pigeon_Sim
             {
         
                 Quaternion inverseQuaternion = Quaternion.Inverse(new Quaternion(deltaVector.X, deltaVector.Y, deltaVector.Z, 0));
-                //Vector3 tempDeltaVector = new Vector3(0, 0, -1) * new Vector3(inverseQuaternion.X, inverseQuaternion.Y, inverseQuaternion.Z);
                 Vector3 tempDeltaVector = Vector3.Cross( Vector3.Up, deltaVector);
                 tempDeltaVector.Normalize();
                 camPositionVector += 3 * tempDeltaVector;
@@ -199,7 +197,6 @@ namespace AssignmentOne_Pigeon_Sim
             if(direction == InputHandler.Direction.Right)
             {
                 Quaternion inverseQuaternion = Quaternion.Inverse(new Quaternion(deltaVector.X, deltaVector.Y, deltaVector.Z, 0));
-                //Vector3 tempDeltaVector = new Vector3(0, 0, -1) * new Vector3(inverseQuaternion.X, inverseQuaternion.Y, inverseQuaternion.Z);
                 Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, deltaVector);
                 tempDeltaVector.Normalize();
                 camPositionVector -= 3 * tempDeltaVector;

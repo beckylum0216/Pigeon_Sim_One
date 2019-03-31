@@ -64,27 +64,41 @@ namespace AssignmentOne_Pigeon_Sim
             {
                 for(int jj = 0; jj < sizeY; jj++)
                 {
-                    Vector3 tempPosition = new Vector3(gridMap[ii, jj].GetCoordX(), gridMap[ii,jj].GetCoordY(), gridMap[ii, jj].GetCoordZ());
-                    Vector3 tempRotation = new Vector3(0, 0, 0);
-                    Plot tempPlot = new Plot(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(),
-                                                tempPosition, tempRotation, plotScale);
-                    landPlots.Add(gridMap[ii, jj].GetBlockType().ToString(), tempPlot);
-
+                    try
+                    {
+                        Vector3 tempPosition = new Vector3(gridMap[ii, jj].GetCoordX(), gridMap[ii, jj].GetCoordY(), gridMap[ii, jj].GetCoordZ());
+                        Vector3 tempOffset = new Vector3(0, 0, 0);
+                        Plot tempPlot = new Plot(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(),
+                                                    tempPosition, gridMap[ii, jj].GetBlockRotation(), plotScale, tempOffset);
+                        landPlots.Add(gridMap[ii, jj].GetBlockType().ToString(), tempPlot);
+                    }
+                    catch( System.ArgumentException e)
+                    {
+                        Debug.WriteLine("Item Already Added! " + e);
+                    }
                 }
             }
         }
 
         public void SetPlotList()
         {
+            string modelFile = "Models/skybox_cube";
+            string textureFile = "Maya/sourceimages/skybox_diffuse";
+            Vector3 positionSkyBox = new Vector3(0, 0, 0);
+            Vector3 rotationSkyBox = new Vector3(0, 0, 0);
+            float scaleSkyBox = 0.5f;
+            // Plot plotSkyBox = new Plot(Content, modelFile, textureFile, positionSkyBox, rotationSkyBox, scaleSkyBox);
+            // plotList.Add(plotSkyBox);
+
             for (int ii = 0; ii < sizeX; ii++)
             {
                 for (int jj = 0; jj < sizeY; jj++)
                 {
                     Vector3 tempPosition = new Vector3(gridMap[ii, jj].GetCoordX(), gridMap[ii, jj].GetCoordY(), gridMap[ii, jj].GetCoordZ());
                     
-                    Vector3 tempRotation = new Vector3(0, 0, 0);
-                    Plot tempPlot = new Plot(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(),
-                                                tempPosition, tempRotation, gridMap[ii, jj].GetBlockScale());
+                    Vector3 tempOffset = new Vector3(10,10,10);
+                    Plot tempPlot = new Plot(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(), tempPosition, 
+                                            gridMap[ii, jj].GetBlockRotation(), gridMap[ii, jj].GetBlockScale(), tempOffset);
                     //Debug.WriteLine("temp x: " + tempPlot.actorPosition.X + " y: " + tempPlot.actorPosition.Y + " Z: " + tempPlot.actorPosition.Z);
 
                     plotList.Add(tempPlot);

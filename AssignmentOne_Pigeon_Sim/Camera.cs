@@ -8,35 +8,51 @@ using System.Threading.Tasks;
 
 namespace AssignmentOne_Pigeon_Sim
 {
-    class Camera
+    public class Camera: Actor
     {
-        Matrix theCamera;
-        private Vector3 cameraPosition;
-        private Vector3 cameraEye;
-        private Vector3 cameraDelta;
 
-        private Vector3 axisVector = new Vector3(1, 0, 0);
-        
-        
+        Matrix theCamera;
+        private Vector3 cameraEye;
+        //private Vector3 deltaVector = new Vector3(1, 0, 0);
         private Quaternion deltaQuaternion;
         
         public Camera(Matrix inputCamera, Vector3 initPosition, Vector3 eyePosition, Vector3 deltaVector)
         {
             this.theCamera = inputCamera;
-            this.cameraPosition = initPosition;
+            this.actorPosition = initPosition;
             this.cameraEye = eyePosition;
-            this.cameraDelta = deltaVector;
+            this.actorRotation = deltaVector;
             this.deltaQuaternion = Quaternion.Identity;
         }
-        
+
+        public override void ActorDraw(Matrix world, Matrix view, Matrix projection)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override float ActorRadians(float inputDegree)
+        {
+            return inputDegree * (float)(Math.PI / 180);
+        }
+
+        public override bool AABBtoAABB(Actor targetActor)
+        {
+            return (maxPoint.X > targetActor.minPoint.X &&
+                    minPoint.X < targetActor.maxPoint.X &&
+                    maxPoint.Y > targetActor.minPoint.Y &&
+                    minPoint.Y < targetActor.maxPoint.Y &&
+                    maxPoint.Z > targetActor.minPoint.Z &&
+                    minPoint.Z < targetActor.maxPoint.Z);
+        }
+
         public void SetCameraPosition(Vector3 inputVector)
         {
-            this.cameraPosition = inputVector;
+            this.actorPosition = inputVector;
         }
 
         public Vector3 GetCameraPosition()
         {
-            return this.cameraPosition;
+            return this.actorPosition;
         }
 
         public void SetCameraEye(Vector3 inputVector)
@@ -56,18 +72,17 @@ namespace AssignmentOne_Pigeon_Sim
 
             if (inputVector.Length() > 0)
             {
-                float radianInput = CameraRadian(inputDegrees);
+                float radianInput = ActorRadians(inputDegrees);
                
                 deltaQuaternion = new Quaternion(deltaVector.X, deltaVector.Y, deltaVector.Z, 0);
 
                 Quaternion resultQuaternion = RotateCamera(radianInput, targetAxis, deltaQuaternion);
                 
-                cameraDelta = new Vector3(resultQuaternion.X, resultQuaternion.Y, resultQuaternion.Z);
-                // Debug.WriteLine("front Axis: " + cameraDelta.X + " " + cameraDelta.Y + " " + cameraDelta.Z);
-
+                actorRotation = new Vector3(resultQuaternion.X, resultQuaternion.Y, resultQuaternion.Z);
+                
                 radianInput = 0;
 
-                return cameraDelta;
+                return actorRotation;
                
             }
             else
@@ -78,32 +93,58 @@ namespace AssignmentOne_Pigeon_Sim
             }
             
         }
-
         
-
-
-        public void cameraMove()
+        public void CameraMove(InputHandler.Direction direction)
         {
+            Debug.WriteLine("Input Down: " + direction);
+            actorRotation.Normalize();
 
+            if (direction == InputHandler.Direction.Forwards)
+            {
+         
+                actorPosition += 3f * actorRotation;
+
+                Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
+            }
+
+            if (direction == InputHandler.Direction.Backwards)
+            {
+               
+                actorPosition -= 3f * actorRotation;
+
+                Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
+            }
+
+            if (direction == InputHandler.Direction.Left)
+            {
+                Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, actorRotation);
+                tempDeltaVector.Normalize();
+                actorPosition += 3 * tempDeltaVector;
+                //actorPosition *= -5 * deltaVector;
+                Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
+            }
+
+            if (direction == InputHandler.Direction.Right)
+            {
+                Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, actorRotation);
+                tempDeltaVector.Normalize();
+                actorPosition -= 3 * tempDeltaVector;
+                //actorPosition *= 5 * deltaVector;
+                
+                Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
+            }
         }
-
-
+        
         // qpq'
         private Quaternion RotateCamera(float inputAngle, Vector3 inputAxis, Quaternion pQuat)
         {
             
             Quaternion qQuat = AxisAngle(inputAngle, inputAxis);
-            // Debug.WriteLine("qQuat: " + qQuat.X + " " + qQuat.Y + " " + qQuat.Z + " " + qQuat.W);
-
-            // Debug.WriteLine("pQuat: " + pQuat.X + " " + pQuat.Y + " " + pQuat.Z + " " + pQuat.W);
             
             Quaternion pqQuat = Quaternion.Multiply(qQuat, pQuat);
-            // Debug.WriteLine("pqQuat: " + pqQuat.X + " " + pqQuat.Y + " " + pqQuat.Z + " " + pqQuat.W);
-
+            
             Quaternion resultQuat =  Quaternion.Multiply(pqQuat, Quaternion.Inverse(qQuat));
-
-            // Debug.WriteLine("resultQuat: " + resultQuat.X + " " + resultQuat.Y + " " + resultQuat.Z + " " + resultQuat.W);
-
+            
             deltaQuaternion = resultQuat;
 
             return resultQuat;
@@ -116,27 +157,22 @@ namespace AssignmentOne_Pigeon_Sim
 
             // Normalise rotation axis to have unit length
             inputAxis.Normalize();
-            //Debug.WriteLine("input Axis: " + inputAxis.X + " "+ inputAxis.Y + " " + inputAxis.Z);
-
+           
             sinTheta = Math.Sin(theTheta / 2);
-
-            //Debug.WriteLine("sinTheta: " + sinTheta);
-
+            
             // Convert to rotation quaternion
             rotationQuart.X = (float)(inputAxis.X * sinTheta);  // theTheta should be in radians
             rotationQuart.Y = (float)(inputAxis.Y * sinTheta);
             rotationQuart.Z = (float)(inputAxis.Z * sinTheta);
             rotationQuart.W = (float)(Math.Cos(theTheta / 2));
-
-            //Debug.WriteLine("QangleAxis: " + rotationQuart.X + " " + rotationQuart.Y + " " + rotationQuart.Z + " "+ rotationQuart.W);
-
+            
             return rotationQuart;
         }
         
-        public float CameraRadian(float inputDegree)
-        {
-            return inputDegree * (float)(Math.PI / 180);
-        }
+        
+
+
+
 
         
     }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace AssignmentOne_Pigeon_Sim
 {
-    class InputHandler
+    public class InputHandler
     {
         public enum Direction { Forwards, Backwards, Left, Right, NULL };
         KeyboardState keyboardInput;

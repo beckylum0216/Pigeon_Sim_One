@@ -26,6 +26,7 @@ namespace AssignmentOne_Pigeon_Sim
         public void SetMap()
         {
 
+
             // sets the initial "block consisting of building and adjacent road
             for(int ii = 0; ii < sizeX; ii++)
             {
@@ -52,7 +53,7 @@ namespace AssignmentOne_Pigeon_Sim
                         {
                             string modelFile = "Models/city_road_02";
                             string textureFile = "Maya/sourceimages/city_road_02_dif";
-                            Vector3 roadRotation = new Vector3(1, 0, 0);
+                            Vector3 roadRotation = new Vector3(0, 90, 00);
                             Block roadNorth = new Block(ii, -2, jj - 1, Block.buildType.RoadHorizontal, modelFile, textureFile, 1f, roadRotation);
                             gridMap[ii, jj - 1] = roadNorth;
                         }
@@ -70,7 +71,7 @@ namespace AssignmentOne_Pigeon_Sim
                         {
                             string modelFile = "Models/city_road_02";
                             string textureFile = "Maya/sourceimages/city_road_02_dif";
-                            Vector3 roadRotation = new Vector3(1, 0, 0);
+                            Vector3 roadRotation = new Vector3(0, 90, 00);
                             Block roadSouth = new Block(ii, -2, jj + 1, Block.buildType.RoadHorizontal, modelFile, textureFile, 1f, roadRotation);
                             gridMap[ii, jj + 1] = roadSouth;
                         }

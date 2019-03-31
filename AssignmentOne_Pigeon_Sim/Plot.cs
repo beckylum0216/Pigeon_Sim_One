@@ -10,19 +10,19 @@ using Microsoft.Xna.Framework.Graphics;
 namespace AssignmentOne_Pigeon_Sim
 {
     public class Plot : Actor
-    {   
+    {
 
         public Plot(ContentManager Content,  String modelFile, String textureFile, 
-                            Vector3 inputPosition, Vector3 inputRotation, float inputScale)
+                        Vector3 inputPosition, Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset)
         {
             this.modelPath = modelFile;
             this.texturePath = textureFile;
-
             this.actorModel = Content.Load<Model>(modelPath);
             this.actorTexture = Content.Load<Texture2D>(texturePath);
             this.actorPosition = inputPosition;
             this.actorRotation = inputRotation;
             this.actorScale = inputScale;
+            this.AABBOffset = inputAABBOffset;
         }
 
         public void SetPosition(Vector3 inputPosition)
@@ -77,7 +77,7 @@ namespace AssignmentOne_Pigeon_Sim
             return (float)(inputDegrees * (Math.PI / 180));
         }
 
-        public override Matrix ActorInit()
+        public Matrix ActorInit()
         {
 
             float radianX = ActorRadians(actorRotation.X);
@@ -96,14 +96,40 @@ namespace AssignmentOne_Pigeon_Sim
             return objPosition;
         }
 
-        public override bool ActorCollider()
-        {
-            return false;
-        }
-
         public Actor ActorClone()
         {
-            return new Plot(Content, modelPath, texturePath, actorPosition, actorRotation, actorScale);
+            return new Plot(Content, modelPath, texturePath, actorPosition, actorRotation, actorScale, AABBOffset);
+        }
+
+        public void SetMinPoint()
+        {
+            this.minPoint = actorPosition - AABBOffset;
+        }
+
+        public Vector3 GetMinPoint()
+        {
+            return this.minPoint;
+        }
+
+        public void SetMaxPoint()
+        {
+            this.maxPoint = actorPosition + AABBOffset;
+        }
+
+        public Vector3 GetMaxPoint()
+        {
+            return this.minPoint;
+        }
+
+        public override bool AABBtoAABB(Actor targetActor)
+        {
+
+            return (maxPoint.X > targetActor.minPoint.X &&
+                    minPoint.X < targetActor.maxPoint.X &&
+                    maxPoint.Y > targetActor.minPoint.Y &&
+                    minPoint.Y < targetActor.maxPoint.Y &&
+                    maxPoint.Z > targetActor.minPoint.Z &&
+                    minPoint.Z < targetActor.maxPoint.Z);
         }
 
     }
