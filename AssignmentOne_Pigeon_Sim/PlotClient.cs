@@ -99,7 +99,7 @@ namespace AssignmentOne_Pigeon_Sim
                 {
                     Vector3 tempPosition = new Vector3(gridMap[ii, jj].GetCoordX(), gridMap[ii, jj].GetCoordY(), gridMap[ii, jj].GetCoordZ());
                     
-                    Vector3 tempOffset = new Vector3(10, 6, 10);
+                    Vector3 tempOffset = new Vector3(10, 5, 10);
                     Plot tempPlot = new Plot(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(), tempPosition, 
                                             gridMap[ii, jj].GetBlockRotation(), gridMap[ii, jj].GetBlockScale(), tempOffset);
                     //Debug.WriteLine("temp x: " + tempPlot.actorPosition.X + " y: " + tempPlot.actorPosition.Y + " Z: " + tempPlot.actorPosition.Z);

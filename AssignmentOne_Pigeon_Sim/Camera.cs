@@ -100,7 +100,7 @@ namespace AssignmentOne_Pigeon_Sim
 
         public void CameraMove(InputHandler.Direction direction, float cameraSpeed, float deltaTime, float fps)
         {
-            Debug.WriteLine("Input Down: " + direction);
+            //Debug.WriteLine("Input Down: " + direction);
             actorRotation.Normalize();
 
             if (direction == InputHandler.Direction.Forwards)

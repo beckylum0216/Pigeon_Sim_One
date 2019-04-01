@@ -83,6 +83,7 @@ namespace AssignmentOne_Pigeon_Sim
                     minPoint.Z < targetActor.maxPoint.Z);
         }
 
+        // https://gamedev.stackexchange.com/questions/44500/how-many-and-which-axes-to-use-for-3d-obb-collision-with-sat
         public void AABBResolution(Actor targetActor)
         {
 
@@ -281,11 +282,12 @@ namespace AssignmentOne_Pigeon_Sim
 
             overlapDepth = theOverlap.Length();
 
-            theMTV = Vector3.Multiply(axisNormal, overlapDepth+0.005f);
-
-           
+            theMTV = Vector3.Multiply(axisNormal, overlapDepth);
+            theMTV.Normalize();
             // MTV is usually the normal of the vector times the overlapdepth
             // projection normal is analogous to axis
+            Debug.WriteLine("MTV:" + theMTV);
+            
             
             return theMTV;
         }
