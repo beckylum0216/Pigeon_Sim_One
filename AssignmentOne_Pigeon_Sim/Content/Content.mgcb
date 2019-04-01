@@ -13,6 +13,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Audio/Pigeon-Song.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Audio/Pigeon-Song.mp3
+
 #begin maya/sourceimages/city_residential_03_dif.png
 /importer:TextureImporter
 /processor:TextureProcessor

@@ -120,7 +120,7 @@ namespace AssignmentOne_Pigeon_Sim
                         textureFile = "Maya/sourceimages/city_residential_03_dif";
                         Vector3 positionBuilding = new Vector3(gridMap[ii,jj].GetCoordX(), 0, gridMap[ii, jj].GetCoordZ());
                         Vector3 rotationBuilding = new Vector3(0, 0, 0);
-                        Vector3 AABBOffsetBuilding = new Vector3(15, 30, 15);
+                        Vector3 AABBOffsetBuilding = new Vector3(15, 20, 15);
                         float scaleBuilding = 2.5f;
                         Plot plotBuilding = new Plot(Content, modelFile, textureFile, positionBuilding, rotationBuilding, scaleBuilding, AABBOffsetBuilding);
                         plotList.Add(plotBuilding);

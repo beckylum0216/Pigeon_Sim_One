@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using System.Diagnostics;
 
 namespace AssignmentOne_Pigeon_Sim
@@ -70,8 +71,12 @@ namespace AssignmentOne_Pigeon_Sim
             Vector3 camPositionVector = Vector3.Add(new Vector3(50, 0, 0), new Vector3(0, 1.6f, 0));
             Vector3 deltaVector = new Vector3(0.001f, 0, 0);
             camera = new Camera(theCamera, camPositionVector, camEyeVector, deltaVector);
-            
             Mouse.SetPosition((int)centerX, (int)centerY);
+
+            Song birdSong = Content.Load<Song>("Audio/Pigeon-Song");
+            MediaPlayer.Play(birdSong);
+            MediaPlayer.IsRepeating = true;
+
             base.Initialize();
         }
 
