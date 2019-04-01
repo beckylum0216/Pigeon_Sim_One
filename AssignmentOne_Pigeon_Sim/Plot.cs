@@ -23,6 +23,8 @@ namespace AssignmentOne_Pigeon_Sim
             this.actorRotation = inputRotation;
             this.actorScale = inputScale;
             this.AABBOffset = inputAABBOffset;
+            this.maxPoint = this.actorPosition + this.AABBOffset;
+            this.minPoint = this.actorPosition - this.AABBOffset;
         }
 
         public void SetPosition(Vector3 inputPosition)
@@ -55,47 +57,13 @@ namespace AssignmentOne_Pigeon_Sim
             return this.actorScale;
         }
 
-        public override void ActorDraw(Matrix world, Matrix view, Matrix projection)
-        {
-            foreach (ModelMesh mesh in actorModel.Meshes)
-            {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    effect.World = world * ActorInit();
-                    effect.View = view;
-                    effect.Projection = projection;
-                    effect.TextureEnabled = true;
-                    effect.Texture = actorTexture;
-                }
 
-                mesh.Draw();
-            }
+        public override Matrix ActorUpdate(Vector3 inputVector)
+        {
+            throw new NotImplementedException();
         }
 
-        public override float ActorRadians(float inputDegrees)
-        {
-            return (float)(inputDegrees * (Math.PI / 180));
-        }
-
-        public Matrix ActorInit()
-        {
-
-            float radianX = ActorRadians(actorRotation.X);
-            float radianY = ActorRadians(actorRotation.Y);
-            float radianZ = ActorRadians(actorRotation.Z);
-
-
-            Matrix objScale = Matrix.CreateScale(actorScale);
-            Matrix objTranslate = Matrix.CreateTranslation(actorPosition);
-            Matrix objRotateX = Matrix.CreateRotationX(radianX);
-            Matrix objRotateY = Matrix.CreateRotationY(radianY);
-            Matrix objRotateZ = Matrix.CreateRotationZ(radianZ);
-
-            Matrix objPosition =  objScale * objRotateX * objRotateY * objRotateZ * objTranslate;
-
-            return objPosition;
-        }
-
+        
         public Actor ActorClone()
         {
             return new Plot(Content, modelPath, texturePath, actorPosition, actorRotation, actorScale, AABBOffset);
@@ -121,16 +89,6 @@ namespace AssignmentOne_Pigeon_Sim
             return this.minPoint;
         }
 
-        public override bool AABBtoAABB(Actor targetActor)
-        {
-
-            return (maxPoint.X > targetActor.minPoint.X &&
-                    minPoint.X < targetActor.maxPoint.X &&
-                    maxPoint.Y > targetActor.minPoint.Y &&
-                    minPoint.Y < targetActor.maxPoint.Y &&
-                    maxPoint.Z > targetActor.minPoint.Z &&
-                    minPoint.Z < targetActor.maxPoint.Z);
-        }
-
+        
     }
 }

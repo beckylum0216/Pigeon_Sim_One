@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace AssignmentOne_Pigeon_Sim
 {
+    // https://www.gamefromscratch.com/post/2015/06/28/MonoGame-Tutorial-Handling-Keyboard-Mouse-and-GamePad-Input.aspx
+
     public class InputHandler
     {
         public enum Direction { Forwards, Backwards, Left, Right, NULL };
@@ -27,6 +29,8 @@ namespace AssignmentOne_Pigeon_Sim
 
         }
 
+
+        // https://www.gamasutra.com/blogs/JoshSutphin/20130416/190541/Doing_Thumbstick_Dead_Zones_Right.php
         public Vector3 MouseHandler( int screenX, int screenY, float mouseSensitivity)
         {
             float magnitude = 0.25f;

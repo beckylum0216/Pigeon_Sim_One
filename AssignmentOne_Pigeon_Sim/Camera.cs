@@ -23,26 +23,27 @@ namespace AssignmentOne_Pigeon_Sim
             this.cameraEye = eyePosition;
             this.actorRotation = deltaVector;
             this.deltaQuaternion = Quaternion.Identity;
+            this.AABBOffset = new Vector3(1f, 1f, 1f);
+            this.maxPoint = this.actorPosition + this.AABBOffset;
+            this.minPoint = this.actorPosition - this.AABBOffset;
         }
 
-        public override void ActorDraw(Matrix world, Matrix view, Matrix projection)
+        
+        public override Matrix ActorUpdate(Vector3 inputVector)
         {
-            throw new NotImplementedException();
-        }
+            // calculate pitch axis for rotating, therefore the orthogonal between the forward and up 
+            // assuming righthandedness
+            Vector3 pitchAxis = Vector3.Cross(actorRotation, Vector3.Up);
+            pitchAxis.Normalize();
 
-        public override float ActorRadians(float inputDegree)
-        {
-            return inputDegree * (float)(Math.PI / 180);
-        }
+            actorRotation = CameraUpdate(actorRotation, pitchAxis, inputVector.Y, inputVector);
+            actorRotation = CameraUpdate(actorRotation, Vector3.Up, -inputVector.X, -inputVector);
 
-        public override bool AABBtoAABB(Actor targetActor)
-        {
-            return (maxPoint.X > targetActor.minPoint.X &&
-                    minPoint.X < targetActor.maxPoint.X &&
-                    maxPoint.Y > targetActor.minPoint.Y &&
-                    minPoint.Y < targetActor.maxPoint.Y &&
-                    maxPoint.Z > targetActor.minPoint.Z &&
-                    minPoint.Z < targetActor.maxPoint.Z);
+            cameraEye = actorPosition + actorRotation; // this is the correct 
+            
+            Matrix tempCameraObj = Matrix.CreateLookAt(actorPosition, cameraEye, Vector3.Up);
+
+            return tempCameraObj;
         }
 
         public void SetCameraPosition(Vector3 inputVector)
@@ -82,6 +83,8 @@ namespace AssignmentOne_Pigeon_Sim
                 
                 radianInput = 0;
 
+
+
                 return actorRotation;
                
             }
@@ -89,12 +92,13 @@ namespace AssignmentOne_Pigeon_Sim
             {
 
                 return deltaVector;
-               
+
             }
             
         }
         
-        public void CameraMove(InputHandler.Direction direction)
+
+        public void CameraMove(InputHandler.Direction direction, float cameraSpeed, float deltaTime, float fps)
         {
             Debug.WriteLine("Input Down: " + direction);
             actorRotation.Normalize();
@@ -102,7 +106,7 @@ namespace AssignmentOne_Pigeon_Sim
             if (direction == InputHandler.Direction.Forwards)
             {
          
-                actorPosition += 3f * actorRotation;
+                actorPosition += cameraSpeed * actorRotation * deltaTime * fps;
 
                 Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
             }
@@ -110,7 +114,7 @@ namespace AssignmentOne_Pigeon_Sim
             if (direction == InputHandler.Direction.Backwards)
             {
                
-                actorPosition -= 3f * actorRotation;
+                actorPosition -= cameraSpeed * actorRotation * deltaTime * fps;
 
                 Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
             }
@@ -119,7 +123,7 @@ namespace AssignmentOne_Pigeon_Sim
             {
                 Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, actorRotation);
                 tempDeltaVector.Normalize();
-                actorPosition += 3 * tempDeltaVector;
+                actorPosition += cameraSpeed * tempDeltaVector * deltaTime * fps;
                 //actorPosition *= -5 * deltaVector;
                 Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
             }
@@ -128,13 +132,18 @@ namespace AssignmentOne_Pigeon_Sim
             {
                 Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, actorRotation);
                 tempDeltaVector.Normalize();
-                actorPosition -= 3 * tempDeltaVector;
+                actorPosition -= cameraSpeed * tempDeltaVector * deltaTime * fps;
                 //actorPosition *= 5 * deltaVector;
                 
                 Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
             }
+
+            // calculates the new camera bounding box
+            this.maxPoint = this.actorPosition + this.AABBOffset;
+            this.minPoint = this.actorPosition - this.AABBOffset;
         }
-        
+
+        // http://in2gpu.com/2016/03/14/opengl-fps-camera-quaternion/
         // qpq'
         private Quaternion RotateCamera(float inputAngle, Vector3 inputAxis, Quaternion pQuat)
         {
@@ -168,12 +177,10 @@ namespace AssignmentOne_Pigeon_Sim
             
             return rotationQuart;
         }
-        
-        
-
-
-
 
         
+
+
+
     }
 }
