@@ -52,8 +52,7 @@ namespace AssignmentOne_Pigeon_Sim
             float radianX = ActorRadians(actorRotation.X);
             float radianY = ActorRadians(actorRotation.Y);
             float radianZ = ActorRadians(actorRotation.Z);
-
-
+            
             Matrix objScale = Matrix.CreateScale(actorScale);
             Matrix objTranslate = Matrix.CreateTranslation(actorPosition);
             Matrix objRotateX = Matrix.CreateRotationX(radianX);
@@ -287,10 +286,12 @@ namespace AssignmentOne_Pigeon_Sim
             // MTV is usually the normal of the vector times the overlapdepth
             // projection normal is analogous to axis
             Debug.WriteLine("MTV:" + theMTV);
-            
-            
-            return theMTV;
+
+
+            return theMTV + new Vector3(0.3f, 0.3f, 0.3f);
         }
+
+
 
 
     }

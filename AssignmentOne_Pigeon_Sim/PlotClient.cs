@@ -12,7 +12,7 @@ namespace AssignmentOne_Pigeon_Sim
 {
     class PlotClient
     {
-        private List <Plot> plotList = new List<Plot>();
+        private List <Actor> plotList = new List<Actor>();
         private Dictionary<string, Actor> landPlots = new Dictionary<string, Actor>();
         private Block[,] gridMap;
         private ContentManager Content;
@@ -52,7 +52,7 @@ namespace AssignmentOne_Pigeon_Sim
             return landPlots;
         }
 
-        public List<Plot> GetPlotList()
+        public List<Actor> GetPlotList()
         {
             return plotList;
         }
@@ -60,6 +60,7 @@ namespace AssignmentOne_Pigeon_Sim
         // create prototypes
         public void SetPlotDictionary()
         {
+            //set up roads and tiles
             for(int ii = 0; ii < sizeX; ii++)
             {
                 for(int jj = 0; jj < sizeY; jj++)
@@ -78,6 +79,8 @@ namespace AssignmentOne_Pigeon_Sim
                     }
                 }
             }
+
+
         }
 
         // bad bad code 
@@ -85,14 +88,17 @@ namespace AssignmentOne_Pigeon_Sim
         {
             string modelFile = "Models/skybox_cube";
             string textureFile = "Maya/sourceimages/skybox_diffuse";
-            Vector3 positionSkyBox = new Vector3(0, 0.5f, 0);
+            float centerOrigin = (23 * 22) / 2;
+            Vector3 positionSkyBox = new Vector3(centerOrigin, 0f, centerOrigin);
             Vector3 rotationSkyBox = new Vector3(0, 0, 0);
             Vector3 AABBOffset = new Vector3(0, 0, 0);
-            float scaleSkyBox = 20f;
+            float scaleSkyBox = 15f;
             Plot plotSkyBox = new Plot(Content, modelFile, textureFile, positionSkyBox, rotationSkyBox, scaleSkyBox, AABBOffset); 
             plotList.Add(plotSkyBox);
 
+            
 
+            // adds to the list the land and road tiles
             for (int ii = 0; ii < sizeX; ii++)
             {
                 for (int jj = 0; jj < sizeY; jj++)

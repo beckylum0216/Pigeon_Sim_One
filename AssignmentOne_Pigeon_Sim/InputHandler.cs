@@ -14,7 +14,7 @@ namespace AssignmentOne_Pigeon_Sim
 
     public class InputHandler
     {
-        public enum Direction { Forwards, Backwards, Left, Right, NULL };
+        public enum keyStates { Forwards, Backwards, Left, Right, NULL, Pigeon, FPS, CW, CCW};
         KeyboardState keyboardInput;
         MouseState mouseInput;
         Vector3 mouseDelta;
@@ -80,41 +80,56 @@ namespace AssignmentOne_Pigeon_Sim
         }
 
         
-        public Direction KeyboardHandler(Game1 game)
+        public keyStates KeyboardHandler(Game1 game)
         {
             keyboardInput = Keyboard.GetState();
-            Direction directionState = Direction.NULL;
+            keyStates directionState = keyStates.NULL;
 
             if(keyboardInput.IsKeyDown(Keys.W))
             {
                 Debug.WriteLine("KeyDown W!!!");
-                directionState = Direction.Forwards;
+                directionState = keyStates.Forwards;
             }
 
             if(keyboardInput.IsKeyUp(Keys.W))
             {
-                directionState = Direction.NULL;
+                directionState = keyStates.NULL;
             }
 
             if(keyboardInput.IsKeyDown(Keys.S))
             {
-                directionState = Direction.Backwards;
+                directionState = keyStates.Backwards;
             }
 
             if(keyboardInput.IsKeyDown(Keys.A))
             {
-                directionState = Direction.Left;
+                directionState = keyStates.Left;
             }
 
             if(keyboardInput.IsKeyDown(Keys.D))
             {
-                directionState = Direction.Right;
+                directionState = keyStates.Right;
+            }
+
+            if(keyboardInput.IsKeyDown(Keys.E))
+            {
+                directionState = keyStates.CW;
             }
 
             if(keyboardInput.IsKeyDown(Keys.Q))
             {
                 Debug.WriteLine("Pressed Q");
-                game.Exit();
+                directionState = keyStates.CCW;
+            }
+
+            if(keyboardInput.IsKeyDown(Keys.D1))
+            {
+                directionState = keyStates.FPS;
+            }
+
+            if(keyboardInput.IsKeyDown(Keys.D2))
+            {
+                directionState = keyStates.Pigeon;
             }
 
             // this is a hack

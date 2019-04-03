@@ -23,7 +23,9 @@ namespace AssignmentOne_Pigeon_Sim
         private float cameraSpeed;
         private float fps;
         private Vector3 mouseInputDelta;
+        private Pigeon pigeon;
         private Camera camera;
+        private InputHandler.keyStates gameState;
 
         public Game1()
         {
@@ -43,39 +45,46 @@ namespace AssignmentOne_Pigeon_Sim
         /// </summary>
         protected override void Initialize()
         {
-
-
             int screenX = GraphicsDevice.Viewport.Width;
             int screenY = GraphicsDevice.Viewport.Height;
-
             //int screenX = Window.ClientBounds.Width;
             //int screenY = Window.ClientBounds.Height;
+            projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), screenX / screenY, 0.1f, 8000f);
 
             int centerX = (int)(screenX / 2);
             int centerY = (int)(screenY / 2);
+            
+            this.IsMouseVisible = true;
+            Mouse.SetPosition((int)centerX, (int)centerY);
 
-            cameraSpeed = 2f;
-            fps = 60f;
-
-            projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), screenX / screenY, 0.1f, 8000f);
-
-            mapClient = new PlotClient(Content, 11, 11, 1.0f);
+            mapClient = new PlotClient(Content, 23, 23, 1.0f);
             mapClient.SetPlotDictionary();
             mapClient.SetPlotList();
             mapClient.PrintPlotList();
-
-            this.IsMouseVisible = true;
             
             Vector3 camEyeVector = new Vector3(0, 0, 0);
-            Debug.WriteLine("camEyeVector" + camEyeVector.X + " " + camEyeVector.Y + " " + camEyeVector.Z);
-            Vector3 camPositionVector = Vector3.Add(new Vector3(50, 0, 0), new Vector3(0, 1.6f, 0));
-            Vector3 deltaVector = new Vector3(0.001f, 0, 0);
+            Vector3 camPositionVector = Vector3.Add(new Vector3(0, 0, 0), new Vector3(0, 1.6f, 0));
+            Vector3 deltaVector = new Vector3(0, 0, 0.001f);
             camera = new Camera(theCamera, camPositionVector, camEyeVector, deltaVector);
-            Mouse.SetPosition((int)centerX, (int)centerY);
+            cameraSpeed = 2f;
+            fps = 60f;
+
+            // need to singleton this
+            gameState = InputHandler.keyStates.Pigeon;
+            string modelPigeon = "Models/Fireninja_blueninja";
+            string texturePigeon = "Maya/sourceimages/Skin1";
+            Vector3 positionPigeon = camPositionVector;
+            Vector3 rotationPigeon = deltaVector + new Vector3(0, 90, 0);
+            Vector3 AABBOffsetPigeon = new Vector3(0.2f, 0, 0.2f);
+            float scalePigeon = 0.1f;
+            pigeon = new Pigeon(Content, modelPigeon, texturePigeon, positionPigeon, rotationPigeon,
+                                    scalePigeon, AABBOffsetPigeon, camera);
+
 
             Song birdSong = Content.Load<Song>("Audio/Pigeon-Song");
-            MediaPlayer.Play(birdSong);
-            MediaPlayer.IsRepeating = true;
+            // MediaPlayer.Play(birdSong);
+            // MediaPlayer.IsRepeating = true;
+
 
             base.Initialize();
         }
@@ -111,32 +120,58 @@ namespace AssignmentOne_Pigeon_Sim
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            //setting up collisions
-            for(int ii = 0; ii < mapClient.GetPlotList().Count; ii++)
-            {
-                camera.AABBResolution(mapClient.GetPlotList()[ii]);
-            }
-            
-
             //int screenX = GraphicsDevice.Viewport.Width;
             //int screenY = GraphicsDevice.Viewport.Height;
-
             int screenX = Window.ClientBounds.Width;
             int screenY = Window.ClientBounds.Height;
 
             int centerX = (int)(screenX / 2);
             int centerY = (int)(screenY / 2);
 
-            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             inputHandlers = new InputHandler(screenX, screenY);
             mouseInputDelta = inputHandlers.MouseHandler(screenX, screenY, 1.00f);
-            InputHandler.Direction keyboardInput = inputHandlers.KeyboardHandler(this);
-            //InputDown(keyboardInput);
+            InputHandler.keyStates keyboardInput = inputHandlers.KeyboardHandler(this);
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            camera.CameraMove(keyboardInput, cameraSpeed, deltaTime, fps);
+            // selects between first person and third person states 
+            // copies the last known position and rotation to the game state 
+            if(keyboardInput == InputHandler.keyStates.Pigeon)
+            {
+                gameState = InputHandler.keyStates.Pigeon;
+                pigeon.actorPosition = camera.actorPosition;
+                pigeon.actorRotation = camera.actorRotation;
+            }
+            
+            if(keyboardInput == InputHandler.keyStates.FPS)
+            {
+                gameState = InputHandler.keyStates.FPS;
+                camera.actorPosition = pigeon.actorPosition;
+                camera.actorRotation = pigeon.actorRotation;
+            }
 
-            theCamera = camera.ActorUpdate(mouseInputDelta);
+            if (gameState == InputHandler.keyStates.Pigeon)
+            {
+                for(int ii = 0; ii < mapClient.GetPlotList().Count; ii++)
+                {
+                    //pigeon.AABBResolution(mapClient.GetPlotList()[ii]);
+                }
+
+                pigeon.ActorMove(keyboardInput, cameraSpeed, deltaTime, fps);
+                theCamera = pigeon.ActorUpdate(mouseInputDelta);
+            }
+            else
+            {
+                //setting up collisions
+                for (int ii = 0; ii < mapClient.GetPlotList().Count; ii++)
+                {
+                    camera.AABBResolution(mapClient.GetPlotList()[ii]);
+                }
+
+                camera.CameraMove(keyboardInput, cameraSpeed, deltaTime, fps);
+
+                theCamera = camera.ActorUpdate(mouseInputDelta);
+            }
+            
 
             base.Update(gameTime);
         }
@@ -153,6 +188,11 @@ namespace AssignmentOne_Pigeon_Sim
             {
                 mapClient.GetPlotList()[ii].ActorDraw(theWorld, theCamera, projection);
 
+            }
+
+            if(gameState == InputHandler.keyStates.Pigeon)
+            {
+                pigeon.ActorDraw(theWorld, theCamera, projection);
             }
 
             base.Draw(gameTime);

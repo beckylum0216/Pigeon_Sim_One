@@ -28,7 +28,6 @@ namespace AssignmentOne_Pigeon_Sim
             this.minPoint = this.actorPosition - this.AABBOffset;
         }
 
-        
         public override Matrix ActorUpdate(Vector3 inputVector)
         {
             // calculate pitch axis for rotating, therefore the orthogonal between the forward and up 
@@ -40,7 +39,9 @@ namespace AssignmentOne_Pigeon_Sim
             actorRotation = CameraUpdate(actorRotation, Vector3.Up, -inputVector.X, -inputVector);
 
             cameraEye = actorPosition + actorRotation; // this is the correct 
-            
+
+            actorPosition = FloorCheck();
+
             Matrix tempCameraObj = Matrix.CreateLookAt(actorPosition, cameraEye, Vector3.Up);
 
             return tempCameraObj;
@@ -83,8 +84,6 @@ namespace AssignmentOne_Pigeon_Sim
                 
                 radianInput = 0;
 
-
-
                 return actorRotation;
                
             }
@@ -98,12 +97,12 @@ namespace AssignmentOne_Pigeon_Sim
         }
         
 
-        public void CameraMove(InputHandler.Direction direction, float cameraSpeed, float deltaTime, float fps)
+        public void CameraMove(InputHandler.keyStates direction, float cameraSpeed, float deltaTime, float fps)
         {
             //Debug.WriteLine("Input Down: " + direction);
             actorRotation.Normalize();
 
-            if (direction == InputHandler.Direction.Forwards)
+            if (direction == InputHandler.keyStates.Forwards)
             {
          
                 actorPosition += cameraSpeed * actorRotation * deltaTime * fps;
@@ -111,7 +110,7 @@ namespace AssignmentOne_Pigeon_Sim
                 Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
             }
 
-            if (direction == InputHandler.Direction.Backwards)
+            if (direction == InputHandler.keyStates.Backwards)
             {
                
                 actorPosition -= cameraSpeed * actorRotation * deltaTime * fps;
@@ -119,7 +118,7 @@ namespace AssignmentOne_Pigeon_Sim
                 Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
             }
 
-            if (direction == InputHandler.Direction.Left)
+            if (direction == InputHandler.keyStates.Left)
             {
                 Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, actorRotation);
                 tempDeltaVector.Normalize();
@@ -128,7 +127,7 @@ namespace AssignmentOne_Pigeon_Sim
                 Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
             }
 
-            if (direction == InputHandler.Direction.Right)
+            if (direction == InputHandler.keyStates.Right)
             {
                 Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, actorRotation);
                 tempDeltaVector.Normalize();
@@ -178,9 +177,19 @@ namespace AssignmentOne_Pigeon_Sim
             return rotationQuart;
         }
 
+        private Vector3 FloorCheck()
+        {
+            if(actorPosition.Y <= 0)
+            {
+                Vector3 tempVector = new Vector3(actorPosition.X, 0, actorPosition.Z);
+
+                return tempVector;
+            }
+            else
+            {
+                return actorPosition;
+            }
+        }
         
-
-
-
     }
 }
