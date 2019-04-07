@@ -60,8 +60,27 @@ namespace AssignmentOne_Pigeon_Sim
         // create prototypes
         public void SetPlotDictionary()
         {
+            string modelFile = "Models/skybox_cube";
+            string textureFile = "Maya/sourceimages/skybox_diffuse";
+            float centerOrigin = (23 * 22) / 2;
+            Vector3 positionSkyBox = new Vector3(centerOrigin, 0f, centerOrigin);
+            Vector3 rotationSkyBox = new Vector3(0, 0, 0);
+            Vector3 AABBOffset = new Vector3(0, 0, 0);
+            float scaleSkyBox = 15f;
+            SkyBox plotSkyBox = new SkyBox(Content, modelFile, textureFile, positionSkyBox, rotationSkyBox, scaleSkyBox, AABBOffset);
+            landPlots.Add(Block.buildType.SkyBox.ToString(), plotSkyBox);
+
+            modelFile = "Models/city_residential_03";
+            textureFile = "Maya/sourceimages/city_residential_03_dif";
+            Vector3 positionBuilding = new Vector3(0, 0, 0);
+            Vector3 rotationBuilding = new Vector3(0, 0, 0);
+            Vector3 AABBOffsetBuilding = new Vector3(15, 20, 15);
+            float scaleBuilding = 2.5f;
+            Plot plotBuilding = new Plot(Content, modelFile, textureFile, positionBuilding, rotationBuilding, scaleBuilding, AABBOffsetBuilding);
+            landPlots.Add(Block.buildType.Building.ToString(), plotBuilding);
+
             //set up roads and tiles
-            for(int ii = 0; ii < sizeX; ii++)
+            for (int ii = 0; ii < sizeX; ii++)
             {
                 for(int jj = 0; jj < sizeY; jj++)
                 {
@@ -79,8 +98,7 @@ namespace AssignmentOne_Pigeon_Sim
                     }
                 }
             }
-
-
+            
         }
 
         // bad bad code 
@@ -93,11 +111,10 @@ namespace AssignmentOne_Pigeon_Sim
             Vector3 rotationSkyBox = new Vector3(0, 0, 0);
             Vector3 AABBOffset = new Vector3(0, 0, 0);
             float scaleSkyBox = 15f;
-            Plot plotSkyBox = new Plot(Content, modelFile, textureFile, positionSkyBox, rotationSkyBox, scaleSkyBox, AABBOffset); 
+            Camera pseudoCamera = new Camera();
+            Actor plotSkyBox = landPlots["SkyBox"].ActorClone(Content, modelFile, textureFile, positionSkyBox, positionSkyBox, rotationSkyBox, scaleSkyBox, AABBOffset, pseudoCamera);
             plotList.Add(plotSkyBox);
-
             
-
             // adds to the list the land and road tiles
             for (int ii = 0; ii < sizeX; ii++)
             {
@@ -105,14 +122,13 @@ namespace AssignmentOne_Pigeon_Sim
                 {
                     Vector3 tempPosition = new Vector3(gridMap[ii, jj].GetCoordX(), gridMap[ii, jj].GetCoordY(), gridMap[ii, jj].GetCoordZ());
                     
-                    Vector3 tempOffset = new Vector3(10, 5, 10);
+                    Vector3 tempOffset = new Vector3(10, 1, 10);
                     Plot tempPlot = new Plot(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(), tempPosition, 
                                             gridMap[ii, jj].GetBlockRotation(), gridMap[ii, jj].GetBlockScale(), tempOffset);
-                    //Debug.WriteLine("temp x: " + tempPlot.actorPosition.X + " y: " + tempPlot.actorPosition.Y + " Z: " + tempPlot.actorPosition.Z);
-
+                    
                     plotList.Add(tempPlot);
 
-                    //Debug.WriteLine("plot x: " + plotList[ii].actorPosition.X + " y: " + plotList[ii].actorPosition.Y + " Z: "+ plotList[ii].actorPosition.Z);
+                    
                 }
             }
 
@@ -126,8 +142,8 @@ namespace AssignmentOne_Pigeon_Sim
                         textureFile = "Maya/sourceimages/city_residential_03_dif";
                         Vector3 positionBuilding = new Vector3(gridMap[ii,jj].GetCoordX(), 0, gridMap[ii, jj].GetCoordZ());
                         Vector3 rotationBuilding = new Vector3(0, 0, 0);
-                        Vector3 AABBOffsetBuilding = new Vector3(15, 20, 15);
-                        float scaleBuilding = 2.5f;
+                        Vector3 AABBOffsetBuilding = new Vector3(17, 25, 17);
+                        float scaleBuilding = 3f;
                         Plot plotBuilding = new Plot(Content, modelFile, textureFile, positionBuilding, rotationBuilding, scaleBuilding, AABBOffsetBuilding);
                         plotList.Add(plotBuilding);
                     }

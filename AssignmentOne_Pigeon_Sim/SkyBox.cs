@@ -12,7 +12,7 @@ namespace AssignmentOne_Pigeon_Sim
     class SkyBox:Actor
     {
         public SkyBox(ContentManager Content, String modelFile, String textureFile,
-                            Vector3 inputPosition, Vector3 inputRotation, float inputScale)
+                        Vector3 inputPosition, Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset)
         {
             this.modelPath = modelFile;
             this.texturePath = textureFile;
@@ -21,6 +21,7 @@ namespace AssignmentOne_Pigeon_Sim
             this.actorPosition = inputPosition;
             this.actorRotation = inputRotation;
             this.actorScale = inputScale;
+            this.AABBOffset = inputAABBOffset;
         }
 
         public override Matrix ActorUpdate(Vector3 inputVector)
@@ -28,6 +29,10 @@ namespace AssignmentOne_Pigeon_Sim
             throw new NotImplementedException();
         }
 
-        
+        public override Actor ActorClone(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition,Vector3 inputPosition,
+                                    Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset, Camera inputCamera)
+        {
+            return new SkyBox(Content, modelPath, texturePath, actorPosition, actorRotation, actorScale, AABBOffset);
+        }
     }
 }

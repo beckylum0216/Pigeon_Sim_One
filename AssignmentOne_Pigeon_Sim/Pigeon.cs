@@ -16,15 +16,17 @@ namespace AssignmentOne_Pigeon_Sim
         private Vector3 cameraDelta;
         private Vector3 cameraPosition;
         private Vector3 cameraEye;
+        private Vector3 rotationDelta;
         private Quaternion deltaQuaternion;
 
-        public Pigeon(ContentManager Content, String modelFile, String textureFile, Vector3 inputPosition, 
+        public Pigeon(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition, Vector3 inputPosition, 
                         Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset, Camera inputCamera)
         {
             this.modelPath = modelFile;
             this.texturePath = textureFile;
             this.actorModel = Content.Load<Model>(modelPath);
             this.actorTexture = Content.Load<Texture2D>(texturePath);
+            this.futurePosition = predictedPosition;
             this.actorPosition = inputPosition;
             this.actorRotation = inputRotation;
             this.actorScale = inputScale;
@@ -33,26 +35,31 @@ namespace AssignmentOne_Pigeon_Sim
             this.minPoint = this.actorPosition - this.AABBOffset;
             this.camera = inputCamera;
 
-            cameraDelta = new Vector3(0, 5, -20);
+            cameraDelta = new Vector3(0, 0, -20);
             cameraPosition = Vector3.Add(actorPosition, cameraDelta);
         }
 
         public override Matrix ActorUpdate(Vector3 inputVector)
         {
+
+            Debug.WriteLine("Rotation: " + actorRotation);
+
             // calculate pitch axis for rotating, therefore the orthogonal between the forward and up 
             // assuming righthandedness
             Vector3 pitchAxis = Vector3.Cross(actorRotation, Vector3.Up);
             pitchAxis.Normalize();
 
-            actorRotation = PigeonUpdate(actorRotation, pitchAxis, inputVector.Y, inputVector);
-            actorRotation = PigeonUpdate(actorRotation, Vector3.Up, -inputVector.X, -inputVector);
+            // do not use actorrotation changes the "front" orientation when rotated
+            //actorRotation = PigeonUpdate(actorRotation, pitchAxis, inputVector.Y, inputVector);
+            //actorRotation = PigeonUpdate(actorRotation, Vector3.Up, -inputVector.X, -inputVector);
 
-            camera.actorRotation = camera.CameraUpdate(actorRotation, pitchAxis, inputVector.Y, inputVector);
-            camera.actorRotation = camera.CameraUpdate(actorRotation, Vector3.Up, -inputVector.X, -inputVector);
+            camera.actorRotation = camera.CameraUpdate(camera.actorRotation, pitchAxis, inputVector.Y, inputVector);
+            camera.actorRotation = camera.CameraUpdate(camera.actorRotation, Vector3.Up, -inputVector.X, -inputVector);
+
+            //camera.actorRotation = PigeonUpdate(actorRotation, pitchAxis, inputVector.Y, inputVector);
+            //camera.actorRotation = PigeonUpdate(actorRotation, Vector3.Up, -inputVector.X, -inputVector);
 
             actorPosition = FloorCheck();
-
-            //
 
             cameraEye = cameraPosition + camera.actorRotation; // this is the correct 
             
@@ -61,66 +68,98 @@ namespace AssignmentOne_Pigeon_Sim
             return tempCameraObj;
         }
 
+        public override Actor ActorClone(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition,Vector3 inputPosition, 
+                                    Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset, Camera inputCamera)
+        {
+            return new Pigeon(Content, modelPath, texturePath, predictedPosition, actorPosition, actorRotation, actorScale, AABBOffset, inputCamera);
+        }
+
         public void ActorMove(InputHandler.keyStates direction, float cameraSpeed, float deltaTime, float fps)
         {
             //Debug.WriteLine("Input Down: " + direction);
-            actorRotation.Normalize();
+            
 
-            if (direction == InputHandler.keyStates.Forwards)
+            if (direction == InputHandler.keyStates.Right)
             {
+                rotationDelta = actorRotation;
+                rotationDelta.Normalize();
 
-                actorPosition += cameraSpeed * actorRotation * deltaTime * fps;
+                //futurePosition += cameraSpeed * rotationDelta * deltaTime * fps;
+                actorPosition += cameraSpeed * rotationDelta * deltaTime * fps;
+
                 cameraPosition = Vector3.Add(actorPosition, cameraDelta);
 
-                Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
-            }
-
-            if (direction == InputHandler.keyStates.Backwards)
-            {
-
-                actorPosition -= cameraSpeed * actorRotation * deltaTime * fps;
-                cameraPosition = Vector3.Add(actorPosition, cameraDelta);
-
-                Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
             }
 
             if (direction == InputHandler.keyStates.Left)
             {
+                rotationDelta = actorRotation;
+                rotationDelta.Normalize();
+                //futurePosition -= cameraSpeed * rotationDelta * deltaTime * fps;
+                actorPosition -= cameraSpeed * rotationDelta * deltaTime * fps;
+                cameraPosition = Vector3.Add(actorPosition, cameraDelta);
+
+            }
+
+            if (direction == InputHandler.keyStates.Forwards)
+            {
                 Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, actorRotation);
                 tempDeltaVector.Normalize();
+                // futurePosition += cameraSpeed * tempDeltaVector * deltaTime * fps;
                 actorPosition += cameraSpeed * tempDeltaVector * deltaTime * fps;
                 cameraPosition = Vector3.Add(actorPosition, cameraDelta);
-                //actorPosition *= -5 * deltaVector;
-                Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
+                
             }
 
-            if (direction == InputHandler.keyStates.Right)
+            if (direction == InputHandler.keyStates.Backwards)
             {
                 Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, actorRotation);
                 tempDeltaVector.Normalize();
+                // futurePosition -= cameraSpeed * tempDeltaVector * deltaTime * fps;
                 actorPosition -= cameraSpeed * tempDeltaVector * deltaTime * fps;
                 cameraPosition = Vector3.Add(actorPosition, cameraDelta);
-                //actorPosition *= 5 * deltaVector;
-
-                Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
+                
             }
 
+            
             if(direction == InputHandler.keyStates.CW)
             {
-                Debug.WriteLine("Camera before: " + cameraPosition);
-
+                
                 cameraDelta = cameraSpeed * OrbitCW() * deltaTime * fps;
                 cameraPosition = Vector3.Add(actorPosition, cameraDelta);
 
-                Debug.WriteLine("Camera After: " + cameraPosition);
+                // rotating the model to the direction you are facing
+                // calculate pitch axis for rotating, therefore the orthogonal between the forward and up 
+                // assuming righthandedness
+                Vector3 pitchAxis = Vector3.Cross(actorRotation, Vector3.Up);
+                //pitchAxis.Normalize();
+
+                float radian = ActorRadians(1);
+
+                actorRotation = Vector3.Transform(pitchAxis, Matrix.CreateRotationY(radian));
 
             }
 
-            if(direction == InputHandler.keyStates.CCW)
+            if (direction == InputHandler.keyStates.CCW)
             {
                 cameraDelta = cameraSpeed * OrbitCCW() * deltaTime * fps;
                 cameraPosition = Vector3.Add(actorPosition, cameraDelta);
+                
+                // rotating the model to the direction you are facing
+                // calculate pitch axis for rotating, therefore the orthogonal between the forward and up 
+                // assuming righthandedness
+                Vector3 pitchAxis = Vector3.Cross(actorRotation, Vector3.Up);
+                //pitchAxis.Normalize();
+
+                float radian = ActorRadians(-1);
+
+                actorRotation = Vector3.Transform(pitchAxis, Matrix.CreateRotationY(radian));
             }
+            
+
+            // calculates the new camera bounding box
+            this.maxPoint = this.actorPosition + this.AABBOffset;
+            this.minPoint = this.actorPosition - this.AABBOffset;
         }
 
         public Vector3 PigeonUpdate(Vector3 deltaVector, Vector3 targetAxis, float inputDegrees, Vector3 inputVector)
@@ -187,9 +226,9 @@ namespace AssignmentOne_Pigeon_Sim
 
         private Vector3 FloorCheck()
         {
-            if (actorPosition.Y <= 0)
+            if (actorPosition.Y <= 1)
             {
-                Vector3 tempVector = new Vector3(actorPosition.X, 0, actorPosition.Z);
+                Vector3 tempVector = new Vector3(actorPosition.X, 1, actorPosition.Z);
 
                 return tempVector;
             }
@@ -202,28 +241,23 @@ namespace AssignmentOne_Pigeon_Sim
         private Vector3 OrbitCW()
         {
             
-            return Orbit(3);
+            return Orbit(1);
         }
 
         private Vector3 OrbitCCW()
         {
 
-            return Orbit(-3);
+            return Orbit(-1);
         }
 
         private Vector3 Orbit(float inputDegrees)
         {
             float radian = ActorRadians(inputDegrees);
 
-            Vector3 tempVector = cameraPosition - actorPosition;
-
             Vector3 rotateVector = Vector3.Transform(cameraDelta, Matrix.CreateRotationY(radian));
             rotateVector.Normalize();
-            Vector3 resultVector = rotateVector * 20;
-
-
-            Debug.WriteLine("Result Vector: " + resultVector.ToString());
-
+            Vector3 resultVector = rotateVector * 10;
+            
             return resultVector;
         }
     }

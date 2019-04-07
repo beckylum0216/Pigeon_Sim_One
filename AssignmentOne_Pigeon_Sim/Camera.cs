@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,10 +17,13 @@ namespace AssignmentOne_Pigeon_Sim
         private Vector3 cameraEye;
         //private Vector3 deltaVector = new Vector3(1, 0, 0);
         private Quaternion deltaQuaternion;
-        
-        public Camera(Matrix inputCamera, Vector3 initPosition, Vector3 eyePosition, Vector3 deltaVector)
+
+        public Camera() { }
+
+        public Camera(Matrix inputCamera, Vector3 initPosition, Vector3 eyePosition, Vector3 deltaVector, Vector3 inputOffset)
         {
             this.theCamera = inputCamera;
+            this.futurePosition = initPosition;
             this.actorPosition = initPosition;
             this.cameraEye = eyePosition;
             this.actorRotation = deltaVector;
@@ -26,6 +31,23 @@ namespace AssignmentOne_Pigeon_Sim
             this.AABBOffset = new Vector3(1f, 1f, 1f);
             this.maxPoint = this.actorPosition + this.AABBOffset;
             this.minPoint = this.actorPosition - this.AABBOffset;
+        }
+
+        public Camera(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition, Vector3 inputPosition, 
+                        Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset, Camera inputCamera)
+        {
+            this.modelPath = modelFile;
+            this.texturePath = textureFile;
+            this.actorModel = Content.Load<Model>(modelPath);
+            this.actorTexture = Content.Load<Texture2D>(texturePath);
+            this.futurePosition = predictedPosition;
+            this.actorPosition = inputPosition;
+            this.actorRotation = inputRotation;
+            this.actorScale = inputScale;
+            this.AABBOffset = inputAABBOffset;
+            this.maxPoint = this.actorPosition + this.AABBOffset;
+            this.minPoint = this.actorPosition - this.AABBOffset;
+
         }
 
         public override Matrix ActorUpdate(Vector3 inputVector)
@@ -45,6 +67,12 @@ namespace AssignmentOne_Pigeon_Sim
             Matrix tempCameraObj = Matrix.CreateLookAt(actorPosition, cameraEye, Vector3.Up);
 
             return tempCameraObj;
+        }
+
+        public override Actor ActorClone(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition,Vector3 inputPosition,
+                                    Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset, Camera inputCamera)
+        {
+            throw new NotImplementedException();
         }
 
         public void SetCameraPosition(Vector3 inputVector)
@@ -104,15 +132,16 @@ namespace AssignmentOne_Pigeon_Sim
 
             if (direction == InputHandler.keyStates.Forwards)
             {
-         
+                //futurePosition += cameraSpeed * actorRotation * deltaTime * fps;
                 actorPosition += cameraSpeed * actorRotation * deltaTime * fps;
-
+                
                 Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
             }
 
             if (direction == InputHandler.keyStates.Backwards)
             {
-               
+
+                //futurePosition -= cameraSpeed * actorRotation * deltaTime * fps;
                 actorPosition -= cameraSpeed * actorRotation * deltaTime * fps;
 
                 Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
@@ -122,8 +151,9 @@ namespace AssignmentOne_Pigeon_Sim
             {
                 Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, actorRotation);
                 tempDeltaVector.Normalize();
+                //futurePosition += cameraSpeed * tempDeltaVector * deltaTime * fps;
                 actorPosition += cameraSpeed * tempDeltaVector * deltaTime * fps;
-                //actorPosition *= -5 * deltaVector;
+                
                 Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
             }
 
@@ -131,9 +161,9 @@ namespace AssignmentOne_Pigeon_Sim
             {
                 Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, actorRotation);
                 tempDeltaVector.Normalize();
+                //futurePosition -= cameraSpeed * tempDeltaVector * deltaTime * fps;
                 actorPosition -= cameraSpeed * tempDeltaVector * deltaTime * fps;
-                //actorPosition *= 5 * deltaVector;
-                
+               
                 Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
             }
 
@@ -177,11 +207,13 @@ namespace AssignmentOne_Pigeon_Sim
             return rotationQuart;
         }
 
+
+        //
         private Vector3 FloorCheck()
         {
-            if(actorPosition.Y <= 0)
+            if(actorPosition.Y <= 1)
             {
-                Vector3 tempVector = new Vector3(actorPosition.X, 0, actorPosition.Z);
+                Vector3 tempVector = new Vector3(actorPosition.X, 1, actorPosition.Z);
 
                 return tempVector;
             }

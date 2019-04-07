@@ -18,6 +18,7 @@ namespace AssignmentOne_Pigeon_Sim
         public ContentManager Content;
         public Model actorModel;
         public Texture2D actorTexture;
+        public Vector3 futurePosition;
         public Vector3 actorPosition;
         public Vector3 actorRotation;
         public float actorScale;
@@ -35,8 +36,7 @@ namespace AssignmentOne_Pigeon_Sim
             {
                 foreach (BasicEffect effect in mesh.Effects)
                 {
-                    effect.World = world * ActorInit();
-                    effect.View = view;
+                    effect.World = world * ActorInit();                    effect.View = view;
                     effect.Projection = projection;
                     effect.TextureEnabled = true;
                     effect.Texture = actorTexture;
@@ -71,6 +71,9 @@ namespace AssignmentOne_Pigeon_Sim
             return (float)(inputDegrees * (Math.PI / 180));
         }
 
+        public abstract Actor ActorClone(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition,Vector3 inputPosition,
+                                    Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset, Camera inputCamera);
+
         public bool AABBtoAABB(Actor targetActor)
         {
 
@@ -83,12 +86,14 @@ namespace AssignmentOne_Pigeon_Sim
         }
 
         // https://gamedev.stackexchange.com/questions/44500/how-many-and-which-axes-to-use-for-3d-obb-collision-with-sat
-        public void AABBResolution(Actor targetActor)
+        public void AABBResolution(Actor targetActor, float deltaTime, float fps)
         {
 
             List<Vector3> targetVectors = new List<Vector3>();
             List<Vector3> actorVectors = new List<Vector3>();
+           
 
+            
             if(AABBtoAABB(targetActor))
             {
                 targetVectors.Add(new Vector3(targetActor.actorPosition.X - targetActor.AABBOffset.X, targetActor.actorPosition.Y - targetActor.AABBOffset.Y, targetActor.actorPosition.Z - targetActor.AABBOffset.Z));
@@ -109,7 +114,7 @@ namespace AssignmentOne_Pigeon_Sim
                 actorVectors.Add(new Vector3(actorPosition.X + AABBOffset.X, actorPosition.Y + AABBOffset.Y, actorPosition.Z + AABBOffset.Z));
                 actorVectors.Add(new Vector3(actorPosition.X - AABBOffset.X, actorPosition.Y + AABBOffset.Y, actorPosition.Z + AABBOffset.Z));
 
-                Vector3 theMTV = MinimumTranslationVector(targetVectors, actorVectors);
+                Vector3 theMTV = MinimumTranslationVector(targetVectors, actorVectors, deltaTime, fps);
 
                 if (theMTV.Length() > 0)
                 {
@@ -123,10 +128,12 @@ namespace AssignmentOne_Pigeon_Sim
                         actorPosition = Vector3.Add(actorPosition, theMTV);
                     }
                 }
+                
             }
         }
 
-        // finding the closest normal 
+        // finding the closest edge normal
+        // https://gamedev.stackexchange.com/questions/26951/calculating-the-2d-edge-normals-of-a-triangle
         public Vector3 ProjectionNormal(List <Vector3> targetVertices, List<Vector3> actorVertices)
         {
             List<Vector3> tempEdges = new List<Vector3>();
@@ -134,8 +141,9 @@ namespace AssignmentOne_Pigeon_Sim
             Vector3 normalVector;
             int targetIndex = 0;
             int actorIndex = 0;
+
             
-            // getting corner cases
+            // getting edges
             for(int ii = 0; ii < targetVertices.Count; ii++)
             {
                 for(int jj = 0; jj < targetVertices.Count; jj++)
@@ -149,7 +157,7 @@ namespace AssignmentOne_Pigeon_Sim
                 }
             }
 
-
+            // getting faces
             for(int ii = 0; ii < tempEdges.Count; ii++)
             {
                 for(int jj = 0; jj < tempEdges.Count; jj++)
@@ -163,11 +171,12 @@ namespace AssignmentOne_Pigeon_Sim
                 }
             }
 
-            // aggregating all the corners and edges
+            // aggregating all the faces and edges
             for (int ii = 0; ii < targetVertices.Count; ii++)
             {
                 edgeVectors.Add(targetVertices[ii]);
             }
+            
 
             // selecting the closest vertices between target and actor
             Vector3 magnitudeCheck = edgeVectors[0] - actorVertices[0];
@@ -184,11 +193,38 @@ namespace AssignmentOne_Pigeon_Sim
                     }
                 }
             }
+            /*
+            Vector3 magnitudeCheck = targetVertices[0] - actorVertices[0];
+            for (int ii = 0; ii < targetVertices.Count; ii++)
+            {
+                for (int jj = 0; jj < actorVertices.Count; jj++)
+                {
+                    Vector3 magnitudeComparison = targetVertices[ii] - actorVertices[jj];
+                    if (magnitudeComparison.Length() < magnitudeCheck.Length())
+                    {
+                        magnitudeCheck = magnitudeComparison;
+                        targetIndex = ii;
+                        actorIndex = jj;
+                    }
+                }
+            }
+            */
 
             Debug.WriteLine("target index: " + targetIndex + " actor index: " + actorIndex);
-
+            
             normalVector = Vector3.Cross(edgeVectors[targetIndex], actorVertices[actorIndex]);
             //normalVector.Normalize();
+
+            float normalCheck = Vector3.Dot(normalVector, actorVertices[actorIndex]);
+
+            // ensures that the normals are pointing out
+            if(normalCheck > 0)
+            {
+                normalVector = normalVector * -1;
+            }
+
+            Debug.WriteLine("Normal Vector: " + normalVector);
+            
 
             return normalVector;
         }
@@ -204,7 +240,7 @@ namespace AssignmentOne_Pigeon_Sim
             int actorIndex = 0;
             
             axisNormal = ProjectionNormal(targetVectors, actorVectors);
-
+            
             for(int ii = 0; ii < targetVectors.Count - 2; ii++)
             {
                 Vector3 tempEdgeOne;
@@ -238,7 +274,26 @@ namespace AssignmentOne_Pigeon_Sim
                 }
 
             }
+            
+            /*
+            Vector3 magnitudeCheck = targetVectors[0] - actorVectors[0];
+            for (int ii = 0; ii < targetVectors.Count; ii++)
+            {
+                for (int jj = 0; jj < actorVectors.Count; jj++)
+                {
+                    Vector3 magnitudeComparison = targetVectors[ii] - actorVectors[jj];
+                    if (magnitudeComparison.Length() < magnitudeCheck.Length())
+                    {
+                        magnitudeCheck = magnitudeComparison;
+                        targetIndex = ii;
+                        actorIndex = jj;
+                    }
+                }
 
+            }
+            */
+
+            // this is correct
             float theScalar = Vector3.Dot(axisNormal, actorVectors[actorIndex]);
 
             float theUnitScalar = theScalar / actorVectors[actorIndex].LengthSquared();
@@ -265,7 +320,7 @@ namespace AssignmentOne_Pigeon_Sim
         // https://gamedev.stackexchange.com/questions/32545/what-is-the-mtv-minimum-translation-vector-in-sat-seperation-of-axis
         // https://stackoverflow.com/questions/40255953/finding-the-mtv-minimal-translation-vector-using-separating-axis-theorem
         // calculating depth penetration using SAT to find the minimum translation vector
-        public Vector3 MinimumTranslationVector(List<Vector3> targetVectors, List<Vector3> actorVectors)
+        public Vector3 MinimumTranslationVector(List<Vector3> targetVectors, List<Vector3> actorVectors, float deltaTime, float fps)
         {
             //Projection targetObject;
             Vector3 axisNormal;
@@ -276,19 +331,18 @@ namespace AssignmentOne_Pigeon_Sim
             Vector3 theMTV;
 
             axisNormal = ProjectionNormal(targetVectors, actorVectors);
-
+            Debug.WriteLine("axis normal:" + axisNormal);
             theOverlap = ProjectionOverlap(targetVectors, actorVectors);
-
+            Debug.WriteLine("the overlap:" + theOverlap);
             overlapDepth = theOverlap.Length();
-
+            Debug.WriteLine("overlap depth:" + overlapDepth);
             theMTV = Vector3.Multiply(axisNormal, overlapDepth);
             theMTV.Normalize();
             // MTV is usually the normal of the vector times the overlapdepth
             // projection normal is analogous to axis
             Debug.WriteLine("MTV:" + theMTV);
-
-
-            return theMTV + new Vector3(0.3f, 0.3f, 0.3f);
+            
+            return theMTV * deltaTime * fps * 0.5f;
         }
 
 

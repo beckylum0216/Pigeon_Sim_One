@@ -65,19 +65,21 @@ namespace AssignmentOne_Pigeon_Sim
             Vector3 camEyeVector = new Vector3(0, 0, 0);
             Vector3 camPositionVector = Vector3.Add(new Vector3(0, 0, 0), new Vector3(0, 1.6f, 0));
             Vector3 deltaVector = new Vector3(0, 0, 0.001f);
-            camera = new Camera(theCamera, camPositionVector, camEyeVector, deltaVector);
+            Vector3 AABBOffsetCamera = new Vector3(0.5f, 0.25f, 0.5f);
+            camera = new Camera(theCamera, camPositionVector, camEyeVector, deltaVector, AABBOffsetCamera);
             cameraSpeed = 2f;
             fps = 60f;
 
             // need to singleton this
             gameState = InputHandler.keyStates.Pigeon;
-            string modelPigeon = "Models/Fireninja_blueninja";
-            string texturePigeon = "Maya/sourceimages/Skin1";
+            string modelPigeon = "Models/SK_Pigeon";
+            string texturePigeon = "Maya/sourceimages/pigeon_normal2";
+            Vector3 predictedPigeon = camPositionVector;
             Vector3 positionPigeon = camPositionVector;
-            Vector3 rotationPigeon = deltaVector + new Vector3(0, 90, 0);
-            Vector3 AABBOffsetPigeon = new Vector3(0.2f, 0, 0.2f);
-            float scalePigeon = 0.1f;
-            pigeon = new Pigeon(Content, modelPigeon, texturePigeon, positionPigeon, rotationPigeon,
+            Vector3 rotationPigeon = new Vector3(-90, 0, 0) + deltaVector;
+            Vector3 AABBOffsetPigeon = new Vector3(0.5f, 0.25f, 0.5f);
+            float scalePigeon = 0.05f;
+            pigeon = new Pigeon(Content, modelPigeon, texturePigeon, predictedPigeon, positionPigeon, rotationPigeon,
                                     scalePigeon, AABBOffsetPigeon, camera);
 
 
@@ -130,7 +132,9 @@ namespace AssignmentOne_Pigeon_Sim
 
             inputHandlers = new InputHandler(screenX, screenY);
             mouseInputDelta = inputHandlers.MouseHandler(screenX, screenY, 1.00f);
+            mouseInputDelta = inputHandlers.RightGamePadHandler(screenX, screenY, 1.00f);
             InputHandler.keyStates keyboardInput = inputHandlers.KeyboardHandler(this);
+            keyboardInput = inputHandlers.LeftGamePadHandler(this);
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             // selects between first person and third person states 
@@ -151,24 +155,27 @@ namespace AssignmentOne_Pigeon_Sim
 
             if (gameState == InputHandler.keyStates.Pigeon)
             {
-                for(int ii = 0; ii < mapClient.GetPlotList().Count; ii++)
-                {
-                    //pigeon.AABBResolution(mapClient.GetPlotList()[ii]);
-                }
-
+                
                 pigeon.ActorMove(keyboardInput, cameraSpeed, deltaTime, fps);
+                
+                for(int ii = 0; ii < mapClient.GetPlotList().Count; ii += 1)
+                {
+                    pigeon.AABBResolution(mapClient.GetPlotList()[ii], deltaTime, fps);
+                }
+                
+
                 theCamera = pigeon.ActorUpdate(mouseInputDelta);
             }
             else
             {
-                //setting up collisions
-                for (int ii = 0; ii < mapClient.GetPlotList().Count; ii++)
-                {
-                    camera.AABBResolution(mapClient.GetPlotList()[ii]);
-                }
-
                 camera.CameraMove(keyboardInput, cameraSpeed, deltaTime, fps);
+                //setting up collisions
 
+                for(int ii = 0; ii < mapClient.GetPlotList().Count; ii += 1)
+                {
+                    camera.AABBResolution(mapClient.GetPlotList()[ii], deltaTime, fps);
+                }
+                
                 theCamera = camera.ActorUpdate(mouseInputDelta);
             }
             

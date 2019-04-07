@@ -23,7 +23,7 @@ namespace AssignmentOne_Pigeon_Sim
         private Vector3 blockRotation;
 
         // enum of building types
-        public enum buildType {NullBlock, RoadHorizontal, RoadVertical, RoadCorner, Building, RoadT, RoadCross};
+        public enum buildType {NullBlock, RoadHorizontal, RoadVertical, RoadCorner, Building, RoadT, RoadCross, SkyBox};
         private buildType blockType;
 
         private String modelPath;

@@ -12,13 +12,14 @@ namespace AssignmentOne_Pigeon_Sim
     public class Plot : Actor
     {
 
-        public Plot(ContentManager Content,  String modelFile, String textureFile, 
+        public Plot(ContentManager Content,  String modelFile, String textureFile,
                         Vector3 inputPosition, Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset)
         {
             this.modelPath = modelFile;
             this.texturePath = textureFile;
             this.actorModel = Content.Load<Model>(modelPath);
             this.actorTexture = Content.Load<Texture2D>(texturePath);
+            this.futurePosition = inputPosition;
             this.actorPosition = inputPosition;
             this.actorRotation = inputRotation;
             this.actorScale = inputScale;
@@ -63,8 +64,8 @@ namespace AssignmentOne_Pigeon_Sim
             throw new NotImplementedException();
         }
 
-        
-        public Actor ActorClone()
+        public override Actor ActorClone(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition,Vector3 inputPosition,
+                                    Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset, Camera inputCamera)
         {
             return new Plot(Content, modelPath, texturePath, actorPosition, actorRotation, actorScale, AABBOffset);
         }
