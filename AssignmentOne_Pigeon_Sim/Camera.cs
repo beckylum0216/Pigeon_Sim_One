@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace AssignmentOne_Pigeon_Sim
 {
-    public class Camera: Actor
+    public class Camera: Subject
     {
 
         Matrix theCamera;
@@ -18,19 +18,20 @@ namespace AssignmentOne_Pigeon_Sim
         //private Vector3 deltaVector = new Vector3(1, 0, 0);
         private Quaternion deltaQuaternion;
 
-        public Camera() { }
+        public Camera()
+        { }
 
         public Camera(Matrix inputCamera, Vector3 initPosition, Vector3 eyePosition, Vector3 deltaVector, Vector3 inputOffset)
         {
             this.theCamera = inputCamera;
             this.futurePosition = initPosition;
-            this.actorPosition = initPosition;
+            this.subjectPosition = initPosition;
             this.cameraEye = eyePosition;
-            this.actorRotation = deltaVector;
+            this.subjectRotation = deltaVector;
             this.deltaQuaternion = Quaternion.Identity;
             this.AABBOffset = new Vector3(1f, 1f, 1f);
-            this.maxPoint = this.actorPosition + this.AABBOffset;
-            this.minPoint = this.actorPosition - this.AABBOffset;
+            this.maxPoint = this.subjectPosition + this.AABBOffset;
+            this.minPoint = this.subjectPosition - this.AABBOffset;
         }
 
         public Camera(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition, Vector3 inputPosition, 
@@ -38,58 +39,108 @@ namespace AssignmentOne_Pigeon_Sim
         {
             this.modelPath = modelFile;
             this.texturePath = textureFile;
-            this.actorModel = Content.Load<Model>(modelPath);
-            this.actorTexture = Content.Load<Texture2D>(texturePath);
+            this.subjectModel = Content.Load<Model>(modelPath);
+            this.subjectTexture = Content.Load<Texture2D>(texturePath);
             this.futurePosition = predictedPosition;
-            this.actorPosition = inputPosition;
-            this.actorRotation = inputRotation;
-            this.actorScale = inputScale;
+            this.subjectPosition = inputPosition;
+            this.subjectRotation = inputRotation;
+            this.subjectScale = inputScale;
             this.AABBOffset = inputAABBOffset;
-            this.maxPoint = this.actorPosition + this.AABBOffset;
-            this.minPoint = this.actorPosition - this.AABBOffset;
+            this.maxPoint = this.subjectPosition + this.AABBOffset;
+            this.minPoint = this.subjectPosition - this.AABBOffset;
 
         }
 
-        public override Matrix ActorUpdate(Vector3 inputVector)
+        /** 
+         *  @brief update the position state of the camera 
+         *	@param inputVector the mouse inputs in vector form
+         *	@param deltaTime the time the game has elapsed
+         *	@param fps the frame rate
+         *	@return tempCameraObj the position of the camera in matrix form
+         *	@pre 
+         *	@post position update of the camera object
+         */
+        public override Matrix SubjectUpdate(Vector3 inputVector, float deltaTime, float fps)
         {
-            // calculate pitch axis for rotating, therefore the orthogonal between the forward and up 
-            // assuming righthandedness
-            Vector3 pitchAxis = Vector3.Cross(actorRotation, Vector3.Up);
+            /// calculate pitch axis for rotating, therefore the orthogonal between the forward and up 
+            /// assuming righthandedness
+            Vector3 pitchAxis = Vector3.Cross(subjectRotation, Vector3.Up);
             pitchAxis.Normalize();
 
-            actorRotation = CameraUpdate(actorRotation, pitchAxis, inputVector.Y, inputVector);
-            actorRotation = CameraUpdate(actorRotation, Vector3.Up, -inputVector.X, -inputVector);
+            subjectRotation = CameraUpdate(subjectRotation, pitchAxis, inputVector.Y, inputVector);
+            subjectRotation = CameraUpdate(subjectRotation, Vector3.Up, -inputVector.X, -inputVector);
 
-            cameraEye = actorPosition + actorRotation; // this is the correct 
+            cameraEye = subjectPosition + subjectRotation; // this is the correct 
 
-            actorPosition = FloorCheck();
+            subjectPosition = FloorCheck();
 
-            Matrix tempCameraObj = Matrix.CreateLookAt(actorPosition, cameraEye, Vector3.Up);
+            for (int ii = 0; ii < this.GetObservers().Count; ii += 1)
+            {
+
+                if (this.GetObservers()[ii].AABBtoAABB(this))
+                {
+                    if (this.subjectPosition.Y > 20f)
+                    {
+                        this.AABBResolution(this.GetObservers()[ii], deltaTime, fps);
+                    }
+                    else
+                    {
+                        this.AABBCollider(this.GetObservers()[ii]);
+                    }
+                }
+
+            }
+
+            Matrix tempCameraObj = Matrix.CreateLookAt(subjectPosition, cameraEye, Vector3.Up);
 
             return tempCameraObj;
         }
 
-        public override Actor ActorClone(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition,Vector3 inputPosition,
-                                    Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset, Camera inputCamera)
-        {
-            throw new NotImplementedException();
-        }
 
+        /** 
+         *  @brief mutator for the camera position
+         *	@param inputVector the new position 
+         *	@return 
+         *	@pre 
+         *	@post position update of the camera object
+         */
         public void SetCameraPosition(Vector3 inputVector)
         {
-            this.actorPosition = inputVector;
+            this.subjectPosition = inputVector;
         }
 
+
+        /** 
+        *   @brief accessor for the camera position
+        *	@param 
+        *	@return subjectPosition 
+        *	@pre position must exist
+        *	@post 
+        */
         public Vector3 GetCameraPosition()
         {
-            return this.actorPosition;
+            return this.subjectPosition;
         }
 
+        /** 
+       *    @brief mutator for the camera viewport 
+       *	@param inputVector the new camera viewport position
+       *	@return 
+       *	@pre 
+       *	@post position must exist 
+       */
         public void SetCameraEye(Vector3 inputVector)
         {
             this.cameraEye = inputVector;
         }
 
+        /** 
+        *   @brief accessor for the "front" vector. This function also translates a quaternion to a vector 
+        *	@param 
+        *	@return deltaVector  
+        *	@pre vector must exist
+        *	@post  
+        */
         public Vector3 GetDeltaVector()
         {
             Vector3 deltaVector = new Vector3(deltaQuaternion.X, deltaQuaternion.Y, deltaQuaternion.Z);
@@ -97,22 +148,32 @@ namespace AssignmentOne_Pigeon_Sim
             return deltaVector;
         }
 
+        /** 
+        *   @brief This is actually the camera rotation function. Calculates the new rotated position using quaternion rotation
+        *	@param deltaVector the front vector
+        *	@param targetAxis the axis to rotate on
+        *	@param inputDegrees the amount of rotation in degrees
+        *	@param inputVector the mouse input. used to check if there is movement
+        *	@return deltaVector, subjectRotation   
+        *	@pre deltaVector must not be zero
+        *	@post  
+        */
         public Vector3 CameraUpdate(Vector3 deltaVector, Vector3 targetAxis, float inputDegrees, Vector3 inputVector)
         {
 
             if (inputVector.Length() > 0)
             {
-                float radianInput = ActorRadians(inputDegrees);
+                float radianInput = SubjectRadians(inputDegrees);
                
                 deltaQuaternion = new Quaternion(deltaVector.X, deltaVector.Y, deltaVector.Z, 0);
 
                 Quaternion resultQuaternion = RotateCamera(radianInput, targetAxis, deltaQuaternion);
                 
-                actorRotation = new Vector3(resultQuaternion.X, resultQuaternion.Y, resultQuaternion.Z);
+                subjectRotation = new Vector3(resultQuaternion.X, resultQuaternion.Y, resultQuaternion.Z);
                 
                 radianInput = 0;
 
-                return actorRotation;
+                return subjectRotation;
                
             }
             else
@@ -123,57 +184,78 @@ namespace AssignmentOne_Pigeon_Sim
             }
             
         }
-        
 
+        /** 
+        *   @brief This function updates the location of the camera. 
+        *	@param direction the direction the camera is travelling
+        *	@param cameraSpeed the velocity of the camera
+        *	@param deltaTime the slice of time the game has elapsed
+        *	@param fps the framerate
+        *	@return subjectPosition the new camera position    
+        *	@pre 
+        *	@post subjectPosition will be updated
+        */
         public void CameraMove(InputHandler.keyStates direction, float cameraSpeed, float deltaTime, float fps)
         {
-            //Debug.WriteLine("Input Down: " + direction);
-            actorRotation.Normalize();
+           
+            subjectRotation.Normalize();
 
             if (direction == InputHandler.keyStates.Forwards)
             {
                 //futurePosition += cameraSpeed * actorRotation * deltaTime * fps;
-                actorPosition += cameraSpeed * actorRotation * deltaTime * fps;
+                subjectPosition += cameraSpeed * subjectRotation * deltaTime * fps;
                 
-                Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
+                Debug.WriteLine("position Vector: " + subjectPosition.X + " " + subjectPosition.Y + " " + subjectPosition.Z);
             }
 
             if (direction == InputHandler.keyStates.Backwards)
             {
 
                 //futurePosition -= cameraSpeed * actorRotation * deltaTime * fps;
-                actorPosition -= cameraSpeed * actorRotation * deltaTime * fps;
+                subjectPosition -= cameraSpeed * subjectRotation * deltaTime * fps;
 
-                Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
+                Debug.WriteLine("position Vector: " + subjectPosition.X + " " + subjectPosition.Y + " " + subjectPosition.Z);
             }
 
             if (direction == InputHandler.keyStates.Left)
             {
-                Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, actorRotation);
+                Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, subjectRotation);
                 tempDeltaVector.Normalize();
                 //futurePosition += cameraSpeed * tempDeltaVector * deltaTime * fps;
-                actorPosition += cameraSpeed * tempDeltaVector * deltaTime * fps;
+                subjectPosition += cameraSpeed * tempDeltaVector * deltaTime * fps;
                 
-                Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
+                Debug.WriteLine("position Vector: " + subjectPosition.X + " " + subjectPosition.Y + " " + subjectPosition.Z);
             }
 
             if (direction == InputHandler.keyStates.Right)
             {
-                Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, actorRotation);
+                Vector3 tempDeltaVector = Vector3.Cross(Vector3.Up, subjectRotation);
                 tempDeltaVector.Normalize();
                 //futurePosition -= cameraSpeed * tempDeltaVector * deltaTime * fps;
-                actorPosition -= cameraSpeed * tempDeltaVector * deltaTime * fps;
+                subjectPosition -= cameraSpeed * tempDeltaVector * deltaTime * fps;
                
-                Debug.WriteLine("position Vector: " + actorPosition.X + " " + actorPosition.Y + " " + actorPosition.Z);
+                Debug.WriteLine("position Vector: " + subjectPosition.X + " " + subjectPosition.Y + " " + subjectPosition.Z);
             }
 
             // calculates the new camera bounding box
-            this.maxPoint = this.actorPosition + this.AABBOffset;
-            this.minPoint = this.actorPosition - this.AABBOffset;
+            this.maxPoint = this.subjectPosition + this.AABBOffset;
+            this.minPoint = this.subjectPosition - this.AABBOffset;
         }
 
-        // http://in2gpu.com/2016/03/14/opengl-fps-camera-quaternion/
-        // qpq'
+        
+
+
+        /** 
+        *   @brief This function implements the quaternion rotation. qpq'
+        *   @see http://in2gpu.com/2016/03/14/opengl-fps-camera-quaternion/
+        *	@param inputAngle the angle to rotate on 
+        *	@param inputAxis the axis to rotate on 
+        *	@param pQuat the starting position
+        *	@param 
+        *	@return resultQuat the final position of the rotation   
+        *	@pre 
+        *	@post 
+        */
         private Quaternion RotateCamera(float inputAngle, Vector3 inputAxis, Quaternion pQuat)
         {
             
@@ -188,6 +270,17 @@ namespace AssignmentOne_Pigeon_Sim
             return resultQuat;
         }
 
+        /** 
+        *   @brief This function creates a quaternion from an angle and axis
+        *   @see
+        *	@param theTheta the angle in radians
+        *	@param inputAxis the axis to rotate on 
+        *	@param 
+        *	@param 
+        *	@return rotationQuat the quaternion calculated from axis and angle
+        *	@pre 
+        *	@post 
+        */
         private Quaternion AxisAngle(float theTheta, Vector3 inputAxis)
         {
             Quaternion rotationQuart;
@@ -208,18 +301,28 @@ namespace AssignmentOne_Pigeon_Sim
         }
 
 
-        //
+        /** 
+        *   @brief This function creates a ground plane
+        *   @see
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@return tempVector the ground position
+        *	@pre 
+        *	@post 
+        */
         private Vector3 FloorCheck()
         {
-            if(actorPosition.Y <= 1)
+            if(subjectPosition.Y <= 1)
             {
-                Vector3 tempVector = new Vector3(actorPosition.X, 1, actorPosition.Z);
+                Vector3 tempVector = new Vector3(subjectPosition.X, 1, subjectPosition.Z);
 
                 return tempVector;
             }
             else
             {
-                return actorPosition;
+                return subjectPosition;
             }
         }
         

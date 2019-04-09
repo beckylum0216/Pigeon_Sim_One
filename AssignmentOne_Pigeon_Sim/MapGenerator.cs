@@ -22,7 +22,20 @@ namespace AssignmentOne_Pigeon_Sim
             gridMap = new Block[sizeX, sizeZ];
         }
 
-        // generates the map based on a typical chinese chequerboard pattern
+        /** 
+        *   @brief generates the map based on a typical chequerboard pattern
+        *   @see 
+        *	@param 
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@return void
+        *	@pre 
+        *	@post 
+        */
         public void SetMap()
         {
 
@@ -118,8 +131,23 @@ namespace AssignmentOne_Pigeon_Sim
             }
         }
 
-        // this functions helps the program to find the right junction for each empty space
-        // does not take into account orientation
+        
+        /** 
+        *   @brief this functions helps the program to find the right junction for each empty space.
+        *   @brief does not take into account orientation
+        *   @see 
+        *	@param 
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@return junction the number of junctions
+        *	@pre 
+        *	@post 
+        */
+
         private int FindNeighbours(int gridX, int gridY, Block[,] inputGrid)
         {
             int junction = 0;
@@ -160,6 +188,21 @@ namespace AssignmentOne_Pigeon_Sim
            
         }
 
+        /** 
+        *   @brief mutator to set the exact coordinates of the model assets
+        *   @brief 
+        *   @see 
+        *	@param 
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@return void
+        *	@pre 
+        *	@post 
+        */
         public void SetCoords()
         {
             for(int ii = 0; ii < sizeX; ii++)
@@ -177,6 +220,21 @@ namespace AssignmentOne_Pigeon_Sim
             }
         }
 
+        /** 
+        *   @brief accessor to the exact coordinates of the model assets
+        *   @brief 
+        *   @see 
+        *	@param 
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@return void
+        *	@pre 
+        *	@post 
+        */
         public Block[,] GetGridMap()
         {
             return gridMap;
@@ -196,6 +254,21 @@ namespace AssignmentOne_Pigeon_Sim
             }
         }
 
+        /** 
+        *   @brief utility function to print out the coordinates of the grid for debugging
+        *   @brief 
+        *   @see 
+        *	@param 
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@return void
+        *	@pre 
+        *	@post 
+        */
         public void PrintCoords()
         {
             for (int ii = 0; ii < sizeX; ii++)

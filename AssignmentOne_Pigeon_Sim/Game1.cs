@@ -26,6 +26,8 @@ namespace AssignmentOne_Pigeon_Sim
         private Pigeon pigeon;
         private Camera camera;
         private InputHandler.keyStates gameState;
+        private InputHandler.keyStates keyboardInput;
+        private GamePadState gamePadInput;
 
         public Game1()
         {
@@ -82,6 +84,17 @@ namespace AssignmentOne_Pigeon_Sim
             pigeon = new Pigeon(Content, modelPigeon, texturePigeon, predictedPigeon, positionPigeon, rotationPigeon,
                                     scalePigeon, AABBOffsetPigeon, camera);
 
+            gamePadInput = GamePad.GetState(PlayerIndex.One);
+
+            for (int ii = 0; ii < mapClient.GetPlotList().Count; ii += 1)
+            {
+                pigeon.SetObservers(mapClient.GetPlotList()[ii]);
+            }
+
+            for (int ii = 0; ii < mapClient.GetPlotList().Count; ii += 1)
+            {
+                camera.SetObservers(mapClient.GetPlotList()[ii]);
+            }
 
             Song birdSong = Content.Load<Song>("Audio/Pigeon-Song");
             // MediaPlayer.Play(birdSong);
@@ -133,8 +146,16 @@ namespace AssignmentOne_Pigeon_Sim
             inputHandlers = new InputHandler(screenX, screenY);
             mouseInputDelta = inputHandlers.MouseHandler(screenX, screenY, 1.00f);
             mouseInputDelta = inputHandlers.RightGamePadHandler(screenX, screenY, 1.00f);
-            InputHandler.keyStates keyboardInput = inputHandlers.KeyboardHandler(this);
-            keyboardInput = inputHandlers.LeftGamePadHandler(this);
+            if (!gamePadInput.IsConnected)
+            {
+                keyboardInput = inputHandlers.KeyboardHandler();
+            }
+            else
+            {
+                keyboardInput = inputHandlers.LeftGamePadHandler();
+            }
+            
+            
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             // selects between first person and third person states 
@@ -142,15 +163,15 @@ namespace AssignmentOne_Pigeon_Sim
             if(keyboardInput == InputHandler.keyStates.Pigeon)
             {
                 gameState = InputHandler.keyStates.Pigeon;
-                pigeon.actorPosition = camera.actorPosition;
-                pigeon.actorRotation = camera.actorRotation;
+                pigeon.subjectPosition = camera.subjectPosition;
+                pigeon.subjectRotation = camera.subjectRotation;
             }
             
             if(keyboardInput == InputHandler.keyStates.FPS)
             {
                 gameState = InputHandler.keyStates.FPS;
-                camera.actorPosition = pigeon.actorPosition;
-                camera.actorRotation = pigeon.actorRotation;
+                camera.subjectPosition = pigeon.subjectPosition;
+                camera.subjectRotation = pigeon.subjectRotation;
             }
 
             if (gameState == InputHandler.keyStates.Pigeon)
@@ -158,25 +179,19 @@ namespace AssignmentOne_Pigeon_Sim
                 
                 pigeon.ActorMove(keyboardInput, cameraSpeed, deltaTime, fps);
                 
-                for(int ii = 0; ii < mapClient.GetPlotList().Count; ii += 1)
-                {
-                    pigeon.AABBResolution(mapClient.GetPlotList()[ii], deltaTime, fps);
-                }
+                
                 
 
-                theCamera = pigeon.ActorUpdate(mouseInputDelta);
+                theCamera = pigeon.SubjectUpdate(mouseInputDelta, deltaTime, fps);
             }
             else
             {
                 camera.CameraMove(keyboardInput, cameraSpeed, deltaTime, fps);
                 //setting up collisions
 
-                for(int ii = 0; ii < mapClient.GetPlotList().Count; ii += 1)
-                {
-                    camera.AABBResolution(mapClient.GetPlotList()[ii], deltaTime, fps);
-                }
                 
-                theCamera = camera.ActorUpdate(mouseInputDelta);
+                
+                theCamera = camera.SubjectUpdate(mouseInputDelta, deltaTime, fps);
             }
             
 
@@ -199,7 +214,7 @@ namespace AssignmentOne_Pigeon_Sim
 
             if(gameState == InputHandler.keyStates.Pigeon)
             {
-                pigeon.ActorDraw(theWorld, theCamera, projection);
+                pigeon.SubjectDraw(theWorld, theCamera, projection);
             }
 
             base.Draw(gameTime);

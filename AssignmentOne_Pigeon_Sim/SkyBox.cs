@@ -29,8 +29,8 @@ namespace AssignmentOne_Pigeon_Sim
             throw new NotImplementedException();
         }
 
-        public override Actor ActorClone(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition,Vector3 inputPosition,
-                                    Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset, Camera inputCamera)
+        public override Actor ActorClone(ContentManager Content, String modelFile, String textureFile, Vector3 inputPosition,
+                                    Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset)
         {
             return new SkyBox(Content, modelPath, texturePath, actorPosition, actorRotation, actorScale, AABBOffset);
         }

@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 
 namespace AssignmentOne_Pigeon_Sim
 {
-    // https://www.gamefromscratch.com/post/2015/06/28/MonoGame-Tutorial-Handling-Keyboard-Mouse-and-GamePad-Input.aspx
-
+    /// This class implements inputs handling
+    /// @see https://www.gamefromscratch.com/post/2015/06/28/MonoGame-Tutorial-Handling-Keyboard-Mouse-and-GamePad-Input.aspx
     public class InputHandler
     {
         public enum keyStates { Forwards, Backwards, Left, Right, NULL, Pigeon, FPS, CW, CCW };
@@ -33,7 +33,21 @@ namespace AssignmentOne_Pigeon_Sim
         }
 
 
-        // https://www.gamasutra.com/blogs/JoshSutphin/20130416/190541/Doing_Thumbstick_Dead_Zones_Right.php
+        
+        /** 
+        *   @brief function for dealing with mouse inputs
+        *   @see https://www.gamasutra.com/blogs/JoshSutphin/20130416/190541/Doing_Thumbstick_Dead_Zones_Right.php
+        *	@param screenX the total size of the window width
+        *	@param screenY the total size the window height
+        *	@param mouseSensitivity dampenerfor the mouse
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@return mouseDelta the slice of mouse movement locked between 0 and 2 degrees
+        *	@pre 
+        *	@post 
+        */
         public Vector3 MouseHandler(int screenX, int screenY, float mouseSensitivity)
         {
             float magnitude = 0.25f;
@@ -43,40 +57,52 @@ namespace AssignmentOne_Pigeon_Sim
             // get mouse input
             mouseInput = Mouse.GetState();
 
-            // load mouse input into vector and calculate magnitude
+            /// load mouse input into vector and calculate magnitude
             Vector3 inputVector = new Vector3(mouseInput.X, mouseInput.Y, 0);
             Vector3 centerVector = new Vector3(centerX, centerY, 0);
             Vector3 positionVector = Vector3.Subtract(inputVector, centerVector);
 
-            // if magnitude of vector is greater than radius of x
+            /// if magnitude of vector is greater than radius of x
             if (positionVector.Length() < magnitude)
             {
                 mouseDelta = new Vector3(0, 0, 0);
             }
             else
             {
-                // https://books.google.com.au/books?id=RFF0AgAAQBAJ&pg=PA98&lpg=PA98&dq=deadzone+implementation+game+algorithm&source=bl&ots=fZCDZUNrPf&sig=ACfU3U3M4KSKOIelMGPKC9LFrcELk5aZTA&hl=en&sa=X&ved=2ahUKEwja_dnNkZzhAhUIeisKHaaTCzwQ6AEwAXoECAkQAQ#v=onepage&q=deadzone%20implementation%20game%20algorithm&f=false
-                // calculate distance and work out the proportion of distance to center
+                /// @see https://books.google.com.au/books?id=RFF0AgAAQBAJ&pg=PA98&lpg=PA98&dq=deadzone+implementation+game+algorithm&source=bl&ots=fZCDZUNrPf&sig=ACfU3U3M4KSKOIelMGPKC9LFrcELk5aZTA&hl=en&sa=X&ved=2ahUKEwja_dnNkZzhAhUIeisKHaaTCzwQ6AEwAXoECAkQAQ#v=onepage&q=deadzone%20implementation%20game%20algorithm&f=false
+                /// calculate distance and work out the proportion of distance to center
                 float percent = ((float)positionVector.Length() - magnitude) / (magnitude + positionVector.Length());
                 positionVector.Normalize();
 
-                // restricting values between 0 and 2 degrees
+                /// restricting values between 0 and 2 degrees
                 mouseDelta = Vector3.Multiply(positionVector, percent * 2);
 
                 // only use when restricting between 0 and 1
                 //mouseDelta.Normalize();
 
             }
-
-            // Debug.WriteLine("Mouse Vector: " + mouseDelta.X + " " + mouseDelta.Y + " " + mouseDelta.Z);
-
+            
+            /// reset the mouse cursor to the middle of the screen
             Mouse.SetPosition((int)centerX, (int)centerY);
 
             return mouseDelta;
         }
 
-
-        public keyStates KeyboardHandler(Game1 game)
+        /** 
+        *   @brief function for dealing with keyboardinputs
+        *   @see 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@return direction state the discrete movement from the keyboard
+        *	@pre 
+        *	@post 
+        */
+        public keyStates KeyboardHandler()
         {
             keyboardInput = Keyboard.GetState();
             keyStates directionState = keyStates.NULL;
@@ -127,6 +153,20 @@ namespace AssignmentOne_Pigeon_Sim
             return directionState;
         }
 
+        /** 
+        *   @brief function for dealing with xbox controller inputs
+        *   @see 
+        *	@param screenX the total width of the window
+        *	@param screenY the total height of the window
+        *	@param gamePadSensitivity 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@return direction state the discrete movement from the keyboard
+        *	@pre 
+        *	@post 
+        */
         public Vector3 RightGamePadHandler(int screenX, int screenY, float gamePadSensitivity)
         {
             float magnitude = 0.25f;
@@ -152,12 +192,12 @@ namespace AssignmentOne_Pigeon_Sim
                 }
                 else
                 {
-                    // https://books.google.com.au/books?id=RFF0AgAAQBAJ&pg=PA98&lpg=PA98&dq=deadzone+implementation+game+algorithm&source=bl&ots=fZCDZUNrPf&sig=ACfU3U3M4KSKOIelMGPKC9LFrcELk5aZTA&hl=en&sa=X&ved=2ahUKEwja_dnNkZzhAhUIeisKHaaTCzwQ6AEwAXoECAkQAQ#v=onepage&q=deadzone%20implementation%20game%20algorithm&f=false
-                    // calculate distance and work out the proportion of distance to center
+                    /// @see https://books.google.com.au/books?id=RFF0AgAAQBAJ&pg=PA98&lpg=PA98&dq=deadzone+implementation+game+algorithm&source=bl&ots=fZCDZUNrPf&sig=ACfU3U3M4KSKOIelMGPKC9LFrcELk5aZTA&hl=en&sa=X&ved=2ahUKEwja_dnNkZzhAhUIeisKHaaTCzwQ6AEwAXoECAkQAQ#v=onepage&q=deadzone%20implementation%20game%20algorithm&f=false
+                    /// calculate distance and work out the proportion of distance to center
                     float percent = ((float)positionVector.Length() - magnitude) / (magnitude + positionVector.Length());
                     positionVector.Normalize();
 
-                    // restricting values between 0 and 2 degrees
+                    /// restricting values between 0 and 2 degrees
                     mouseDelta = Vector3.Multiply(positionVector, percent * 2);
 
                     // only use when restricting between 0 and 1
@@ -173,7 +213,21 @@ namespace AssignmentOne_Pigeon_Sim
             return mouseDelta;
         }
 
-        public keyStates LeftGamePadHandler(Game1 game)
+        /** 
+        *   @brief function for dealing with xbox controller analog inputs
+        *   @see 
+        *	@param 
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@param 
+        *	@return direction state the discrete movement from the xbox controller
+        *	@pre 
+        *	@post 
+        */
+        public keyStates LeftGamePadHandler()
         {
             // get gamepad input
             gamePadInput = GamePad.GetState(PlayerIndex.One);
@@ -222,11 +276,9 @@ namespace AssignmentOne_Pigeon_Sim
                 {
                     directionState = keyStates.Pigeon;
                 }
-
-
+                
             }
             
-
             // this is a hack
             return directionState;
 

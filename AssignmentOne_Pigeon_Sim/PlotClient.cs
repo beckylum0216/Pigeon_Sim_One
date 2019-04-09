@@ -111,8 +111,7 @@ namespace AssignmentOne_Pigeon_Sim
             Vector3 rotationSkyBox = new Vector3(0, 0, 0);
             Vector3 AABBOffset = new Vector3(0, 0, 0);
             float scaleSkyBox = 15f;
-            Camera pseudoCamera = new Camera();
-            Actor plotSkyBox = landPlots["SkyBox"].ActorClone(Content, modelFile, textureFile, positionSkyBox, positionSkyBox, rotationSkyBox, scaleSkyBox, AABBOffset, pseudoCamera);
+            Actor plotSkyBox = landPlots["SkyBox"].ActorClone(Content, modelFile, textureFile, positionSkyBox, rotationSkyBox, scaleSkyBox, AABBOffset);
             plotList.Add(plotSkyBox);
             
             // adds to the list the land and road tiles
@@ -123,12 +122,10 @@ namespace AssignmentOne_Pigeon_Sim
                     Vector3 tempPosition = new Vector3(gridMap[ii, jj].GetCoordX(), gridMap[ii, jj].GetCoordY(), gridMap[ii, jj].GetCoordZ());
                     
                     Vector3 tempOffset = new Vector3(10, 1, 10);
-                    Plot tempPlot = new Plot(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(), tempPosition, 
-                                            gridMap[ii, jj].GetBlockRotation(), gridMap[ii, jj].GetBlockScale(), tempOffset);
-                    
+                   
+                    Actor tempPlot = landPlots[gridMap[ii, jj].GetBlockType().ToString()].ActorClone(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(), tempPosition, gridMap[ii, jj].GetBlockRotation(), gridMap[ii, jj].GetBlockScale(), tempOffset);
+                    //Plot tempPlot = new Plot(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(), tempPosition, gridMap[ii, jj].GetBlockRotation(), gridMap[ii, jj].GetBlockScale(), tempOffset);
                     plotList.Add(tempPlot);
-
-                    
                 }
             }
 
@@ -144,6 +141,7 @@ namespace AssignmentOne_Pigeon_Sim
                         Vector3 rotationBuilding = new Vector3(0, 0, 0);
                         Vector3 AABBOffsetBuilding = new Vector3(17, 25, 17);
                         float scaleBuilding = 3f;
+                        //Actor plotBuilding = landPlots["Building"].ActorClone(Content, modelFile, textureFile, positionBuilding, rotationBuilding, scaleBuilding, AABBOffsetBuilding);
                         Plot plotBuilding = new Plot(Content, modelFile, textureFile, positionBuilding, rotationBuilding, scaleBuilding, AABBOffsetBuilding);
                         plotList.Add(plotBuilding);
                     }
