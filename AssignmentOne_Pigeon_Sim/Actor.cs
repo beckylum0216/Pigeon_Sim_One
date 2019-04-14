@@ -29,7 +29,6 @@ namespace AssignmentOne_Pigeon_Sim
         public Vector3 maxPoint;
         public Vector3 AABBOffset;
 
-
         
         /** 
         *   @brief This function draws the actor

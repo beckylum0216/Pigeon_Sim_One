@@ -105,7 +105,7 @@ namespace AssignmentOne_Pigeon_Sim
         *	@pre 
         *	@post subjectPosition will be updated
         */
-        public void ActorMove(InputHandler.keyStates direction, float cameraSpeed, float deltaTime, float fps)
+        public void SubjectMove(InputHandler.keyStates direction, float cameraSpeed, float deltaTime, float fps)
         {
             //Debug.WriteLine("Input Down: " + direction);
             

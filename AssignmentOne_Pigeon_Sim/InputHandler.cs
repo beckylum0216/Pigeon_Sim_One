@@ -14,7 +14,7 @@ namespace AssignmentOne_Pigeon_Sim
     /// @see https://www.gamefromscratch.com/post/2015/06/28/MonoGame-Tutorial-Handling-Keyboard-Mouse-and-GamePad-Input.aspx
     public class InputHandler
     {
-        public enum keyStates { Forwards, Backwards, Left, Right, NULL, Pigeon, FPS, CW, CCW };
+        public enum keyStates { Forwards, Backwards, Left, Right, NULL, Pigeon, FPS, CW, CCW, ZoomIn, ZoomOut};
         private KeyboardState keyboardInput;
         private MouseState mouseInput;
         private GamePadState gamePadInput;
@@ -148,6 +148,18 @@ namespace AssignmentOne_Pigeon_Sim
             {
                 directionState = keyStates.Pigeon;
             }
+
+            if(keyboardInput.IsKeyDown(Keys.Z))
+            {
+                directionState = keyStates.ZoomIn;
+            }
+            
+            
+            if(keyboardInput.IsKeyDown(Keys.C))
+            {
+                directionState = keyStates.ZoomOut;
+            }
+            
 
             // this is a hack
             return directionState;

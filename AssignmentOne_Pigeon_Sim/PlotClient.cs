@@ -37,27 +37,82 @@ namespace AssignmentOne_Pigeon_Sim
             gridMap = mapCreate.GetGridMap();
         }
 
+        /** 
+        *   @brief mutator to the landplot dictionary. adds plots to the dictionary
+        *   @see
+        *	@param plotName the key
+        *	@param  plotObj the object
+        *	@param 
+        *	@param 
+        *	@return 
+        *	@pre 
+        *	@post 
+        */
         public void SetPlot(string plotName, Actor plotObj)
         {
             landPlots.Add(plotName, plotObj);
         }
 
+        /** 
+        *   @brief accessor to the landplot dictionary. 
+        *   @see
+        *	@param plotName the key
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@return landPlots element based on key
+        *	@pre 
+        *	@post 
+        */
         public Actor GetPlot(string plotName)
         {
             return landPlots[plotName];
         }
 
+        /** 
+        *   @brief accessor to the landplot dictionary. 
+        *   @see
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@return landPlot the whole dictionary
+        *	@pre 
+        *	@post 
+        */
         public Dictionary<string, Actor> GetLandPlots()
         {
             return landPlots;
         }
 
+        /** 
+        *   @brief accessor to the plot list. 
+        *   @see
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@return plotList the whole list
+        *	@pre 
+        *	@post 
+        */
         public List<Actor> GetPlotList()
         {
             return plotList;
         }
 
-        // create prototypes
+
+        /** 
+        *   @brief function creates all the prototypes for the game. not used as  
+        *   @see
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@return void
+        *	@pre 
+        *	@post 
+        */
         public void SetPlotDictionary()
         {
             string modelFile = "Models/skybox_cube";
@@ -98,7 +153,6 @@ namespace AssignmentOne_Pigeon_Sim
                     }
                 }
             }
-            
         }
 
         // bad bad code 
@@ -106,6 +160,7 @@ namespace AssignmentOne_Pigeon_Sim
         {
             string modelFile = "Models/skybox_cube";
             string textureFile = "Maya/sourceimages/skybox_diffuse";
+            // move the centre of the skybox to the centre of the "city"
             float centerOrigin = (23 * 22) / 2;
             Vector3 positionSkyBox = new Vector3(centerOrigin, 0f, centerOrigin);
             Vector3 rotationSkyBox = new Vector3(0, 0, 0);
@@ -122,9 +177,9 @@ namespace AssignmentOne_Pigeon_Sim
                     Vector3 tempPosition = new Vector3(gridMap[ii, jj].GetCoordX(), gridMap[ii, jj].GetCoordY(), gridMap[ii, jj].GetCoordZ());
                     
                     Vector3 tempOffset = new Vector3(10, 1, 10);
-                   
-                    Actor tempPlot = landPlots[gridMap[ii, jj].GetBlockType().ToString()].ActorClone(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(), tempPosition, gridMap[ii, jj].GetBlockRotation(), gridMap[ii, jj].GetBlockScale(), tempOffset);
-                    //Plot tempPlot = new Plot(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(), tempPosition, gridMap[ii, jj].GetBlockRotation(), gridMap[ii, jj].GetBlockScale(), tempOffset);
+                    // prototyping map tiles not working as planned 
+                    // Actor tempPlot = landPlots[gridMap[ii, jj].GetBlockType().ToString()].ActorClone(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(), tempPosition, gridMap[ii, jj].GetBlockRotation(), gridMap[ii, jj].GetBlockScale(), tempOffset);
+                    Plot tempPlot = new Plot(Content, gridMap[ii, jj].GetModelPath(), gridMap[ii, jj].GetTexturePath(), tempPosition, gridMap[ii, jj].GetBlockRotation(), gridMap[ii, jj].GetBlockScale(), tempOffset);
                     plotList.Add(tempPlot);
                 }
             }
@@ -149,6 +204,17 @@ namespace AssignmentOne_Pigeon_Sim
             }
         }
 
+        /** 
+        *   @brief Utilty function to print the plot list for debugging
+        *   @see
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@return void
+        *	@pre 
+        *	@post 
+        */
         public void PrintPlotList()
         {
             for(int ii = 0; ii < plotList.Count; ii++)

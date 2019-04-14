@@ -97,8 +97,8 @@ namespace AssignmentOne_Pigeon_Sim
             }
 
             Song birdSong = Content.Load<Song>("Audio/Pigeon-Song");
-            // MediaPlayer.Play(birdSong);
-            // MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(birdSong);
+            MediaPlayer.IsRepeating = false;
 
 
             base.Initialize();
@@ -146,8 +146,10 @@ namespace AssignmentOne_Pigeon_Sim
             inputHandlers = new InputHandler(screenX, screenY);
             mouseInputDelta = inputHandlers.MouseHandler(screenX, screenY, 1.00f);
             mouseInputDelta = inputHandlers.RightGamePadHandler(screenX, screenY, 1.00f);
+
             if (!gamePadInput.IsConnected)
             {
+                Debug.WriteLine("gamePadInput: " + gamePadInput.IsConnected);
                 keyboardInput = inputHandlers.KeyboardHandler();
             }
             else
@@ -177,19 +179,14 @@ namespace AssignmentOne_Pigeon_Sim
             if (gameState == InputHandler.keyStates.Pigeon)
             {
                 
-                pigeon.ActorMove(keyboardInput, cameraSpeed, deltaTime, fps);
+                pigeon.SubjectMove(keyboardInput, cameraSpeed, deltaTime, fps);
                 
-                
-                
-
                 theCamera = pigeon.SubjectUpdate(mouseInputDelta, deltaTime, fps);
             }
             else
             {
-                camera.CameraMove(keyboardInput, cameraSpeed, deltaTime, fps);
+                camera.SubjectMove(keyboardInput, cameraSpeed, deltaTime, fps);
                 //setting up collisions
-
-                
                 
                 theCamera = camera.SubjectUpdate(mouseInputDelta, deltaTime, fps);
             }

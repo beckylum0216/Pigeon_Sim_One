@@ -15,7 +15,7 @@ namespace AssignmentOne_Pigeon_Sim
 
         Matrix theCamera;
         private Vector3 cameraEye;
-        //private Vector3 deltaVector = new Vector3(1, 0, 0);
+        private Vector3 zoomVector;
         private Quaternion deltaQuaternion;
 
         public Camera()
@@ -32,6 +32,7 @@ namespace AssignmentOne_Pigeon_Sim
             this.AABBOffset = new Vector3(1f, 1f, 1f);
             this.maxPoint = this.subjectPosition + this.AABBOffset;
             this.minPoint = this.subjectPosition - this.AABBOffset;
+            zoomVector = new Vector3(0, 0, 0);
         }
 
         public Camera(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition, Vector3 inputPosition, 
@@ -195,7 +196,7 @@ namespace AssignmentOne_Pigeon_Sim
         *	@pre 
         *	@post subjectPosition will be updated
         */
-        public void CameraMove(InputHandler.keyStates direction, float cameraSpeed, float deltaTime, float fps)
+        public void SubjectMove(InputHandler.keyStates direction, float cameraSpeed, float deltaTime, float fps)
         {
            
             subjectRotation.Normalize();
@@ -235,6 +236,21 @@ namespace AssignmentOne_Pigeon_Sim
                 subjectPosition -= cameraSpeed * tempDeltaVector * deltaTime * fps;
                
                 Debug.WriteLine("position Vector: " + subjectPosition.X + " " + subjectPosition.Y + " " + subjectPosition.Z);
+            }
+
+            if(direction == InputHandler.keyStates.ZoomIn)
+            {
+                float zoomFactor = 0.05f;
+                subjectPosition /= zoomFactor * subjectRotation * deltaTime * fps;
+                 
+            }
+
+            if (direction == InputHandler.keyStates.ZoomOut)
+            {
+                float zoomFactor = 0.05f;
+                subjectPosition *= zoomFactor * subjectRotation * deltaTime *fps;
+                
+
             }
 
             // calculates the new camera bounding box

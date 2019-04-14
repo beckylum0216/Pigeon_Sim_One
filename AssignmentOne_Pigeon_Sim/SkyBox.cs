@@ -24,11 +24,33 @@ namespace AssignmentOne_Pigeon_Sim
             this.AABBOffset = inputAABBOffset;
         }
 
+        /** 
+        *   @brief abstract method for updating actor. not implemented as not required
+        *   @see
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@return landPlot the whole dictionary
+        *	@pre 
+        *	@post 
+        */
         public override Matrix ActorUpdate(Vector3 inputVector)
         {
             throw new NotImplementedException();
         }
 
+        /** 
+        *   @brief implemented abstract method for cloning a prototype
+        *   @see
+        *	@param 
+        *	@param  
+        *	@param 
+        *	@param 
+        *	@return new skybox actor
+        *	@pre 
+        *	@post 
+        */
         public override Actor ActorClone(ContentManager Content, String modelFile, String textureFile, Vector3 inputPosition,
                                     Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset)
         {
