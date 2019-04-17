@@ -36,7 +36,9 @@ namespace AssignmentOne_Pigeon_Sim
             this.camera = inputCamera;
 
             cameraDelta = new Vector3(0, 0, -20);
+            Matrix temp = Matrix.CreateRotationY(MathHelper.ToRadians(subjectRotation.Y)) * Matrix.CreateTranslation(subjectPosition);
             cameraPosition = Vector3.Add(subjectPosition, cameraDelta);
+            //cameraPosition = temp.Translation + (temp.Backward * 20f);
         }
 
         /** 

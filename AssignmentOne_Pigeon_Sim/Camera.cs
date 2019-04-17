@@ -240,14 +240,14 @@ namespace AssignmentOne_Pigeon_Sim
 
             if(direction == InputHandler.keyStates.ZoomIn)
             {
-                float zoomFactor = 0.05f;
-                subjectPosition /= zoomFactor * subjectRotation * deltaTime * fps;
+                float zoomFactor = 1.005f;
+                subjectPosition *= zoomFactor * subjectRotation * deltaTime * fps;
                  
             }
 
             if (direction == InputHandler.keyStates.ZoomOut)
             {
-                float zoomFactor = 0.05f;
+                float zoomFactor = 0.005f;
                 subjectPosition *= zoomFactor * subjectRotation * deltaTime *fps;
                 
 
