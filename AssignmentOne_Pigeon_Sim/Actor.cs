@@ -101,7 +101,7 @@ namespace AssignmentOne_Pigeon_Sim
         public abstract Matrix ActorUpdate(Vector3 inputVector);
 
         /** 
-        *   @brief This function converts degrees to radians. It a convenience function should use math.
+        *   @brief This function converts degrees to radians. It a convenience function, should use math.
         *   @see 
         *	@param inputDegrees the degree to convert to radians
         *	@param 

@@ -13,7 +13,7 @@ namespace AssignmentOne_Pigeon_Sim
     public class Camera: Subject
     {
 
-        Matrix theCamera;
+        private Matrix theCamera;
         private Vector3 cameraEye;
         private Vector3 zoomVector;
         private Quaternion deltaQuaternion;
