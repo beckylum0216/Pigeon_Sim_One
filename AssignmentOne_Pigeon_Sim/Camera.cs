@@ -135,19 +135,6 @@ namespace AssignmentOne_Pigeon_Sim
             this.cameraEye = inputVector;
         }
 
-        /** 
-        *   @brief accessor for the "front" vector. This function also translates a quaternion to a vector 
-        *	@param 
-        *	@return deltaVector  
-        *	@pre vector must exist
-        *	@post  
-        */
-        public Vector3 GetDeltaVector()
-        {
-            Vector3 deltaVector = new Vector3(deltaQuaternion.X, deltaQuaternion.Y, deltaQuaternion.Z);
-
-            return deltaVector;
-        }
 
         /** 
         *   @brief This is actually the camera rotation function. Calculates the new rotated position using quaternion rotation
