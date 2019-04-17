@@ -123,18 +123,6 @@ namespace AssignmentOne_Pigeon_Sim
             return this.subjectPosition;
         }
 
-        /** 
-       *    @brief mutator for the camera viewport 
-       *	@param inputVector the new camera viewport position
-       *	@return 
-       *	@pre 
-       *	@post position must exist 
-       */
-        public void SetCameraEye(Vector3 inputVector)
-        {
-            this.cameraEye = inputVector;
-        }
-
 
         /** 
         *   @brief This is actually the camera rotation function. Calculates the new rotated position using quaternion rotation
