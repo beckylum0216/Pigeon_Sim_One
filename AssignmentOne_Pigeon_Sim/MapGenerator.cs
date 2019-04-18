@@ -10,9 +10,9 @@ namespace AssignmentOne_Pigeon_Sim
 {
     class MapGenerator
     {
-        int sizeX = 0;
-        int sizeZ = 0;
-        Block[,] gridMap;
+        private int sizeX = 0;
+        private int sizeZ = 0;
+        private Block[,] gridMap;
         
 
         public MapGenerator(int inputX, int inputZ)

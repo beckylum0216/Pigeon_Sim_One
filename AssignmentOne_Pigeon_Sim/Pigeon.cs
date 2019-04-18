@@ -12,7 +12,7 @@ namespace AssignmentOne_Pigeon_Sim
 {
     class Pigeon : Subject
     {
-        Camera camera;
+        private Camera camera;
         private Vector3 cameraDelta;
         private Vector3 cameraPosition;
         private Vector3 cameraEye;
