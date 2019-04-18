@@ -22,6 +22,14 @@ namespace AssignmentOne_Pigeon_Sim
         private Vector3 mouseDelta;
         private Vector3 mousePosition;
 
+        /**
+	    *	@brief parameterised constructor for the InputHandler object. Create a comple InputHandler object.
+	    *	@param screenX width of the window
+        *	@param screenY height of the window
+	    *	@return 
+	    *	@pre 
+	    *	@post InputHandler will exist
+	    */
         public InputHandler(int screenX, int screenY)
         {
             this.mouseDelta = new Vector3(0, 0, 0);
@@ -32,8 +40,6 @@ namespace AssignmentOne_Pigeon_Sim
 
         }
 
-
-        
         /** 
         *   @brief function for dealing with mouse inputs
         *   @see https://www.gamasutra.com/blogs/JoshSutphin/20130416/190541/Doing_Thumbstick_Dead_Zones_Right.php

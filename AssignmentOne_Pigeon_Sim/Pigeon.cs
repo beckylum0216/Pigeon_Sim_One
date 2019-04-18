@@ -19,6 +19,21 @@ namespace AssignmentOne_Pigeon_Sim
         private Vector3 rotationDelta;
         private Quaternion deltaQuaternion;
 
+        /**
+	    *	@brief parameterised constructor to the pigeon object. Create a complete pigeon object.
+	    *	@param Content 
+        *	@param modelFile model file path
+        *	@param textureFile texture file path
+        *	@param predictedPosition predicitve collision method position. Not used
+        *	@param inputPosition initial position of the pigeon
+        *	@param inputRotation initial rotation of the pigeon
+        *	@param inputScale initial scale of the pigeon
+        *	@param inputAABBOffset the bounding box offsets
+        *	@param inputCamera the camera object
+	    *	@return 
+	    *	@pre 
+	    *	@post Camera will exist
+	    */
         public Pigeon(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition, Vector3 inputPosition, 
                         Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset, Camera inputCamera)
         {

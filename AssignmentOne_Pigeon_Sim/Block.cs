@@ -28,11 +28,25 @@ namespace AssignmentOne_Pigeon_Sim
         private String modelPath;
         private String texturePath;
 
+        /**
+	    *	@brief default constructor to the block object
+	    *	@param 
+	    *	@return 
+	    *	@pre 
+	    *	@post Block will exist
+	    */
         public Block()
         {
             this.blockType = buildType.NullBlock;
         }
 
+        /**
+	    *	@brief parameterised constructor to the block object. Creates a complete block object.
+	    *	@param 
+	    *	@return 
+	    *	@pre 
+	    *	@post Block will exist
+	    */
         public Block(int gridX, int gridY, int gridZ, buildType gridType, string modelFile, 
                         string textureFile, float gridScale, Vector3 gridRotation)
         {

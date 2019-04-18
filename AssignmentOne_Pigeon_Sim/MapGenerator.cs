@@ -13,8 +13,15 @@ namespace AssignmentOne_Pigeon_Sim
         private int sizeX = 0;
         private int sizeZ = 0;
         private Block[,] gridMap;
-        
 
+        /**
+	    *	@brief parameterised constructor for the MapGenerator object. Create a complete MapGenerator object.
+	    *	@param inputX grid size
+        *	@param inputZ grid size
+	    *	@return 
+	    *	@pre 
+	    *	@post MapGenerator will exist
+	    */
         public MapGenerator(int inputX, int inputZ)
         {
             sizeX = inputX;

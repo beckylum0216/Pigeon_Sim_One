@@ -11,6 +11,19 @@ namespace AssignmentOne_Pigeon_Sim
 {
     class SkyBox:Actor
     {
+        /**
+	    *	@brief parameterised constructor to the SkyBox object. Create a complete SkyBox object.
+	    *	@param Content 
+        *	@param modelFile model file path
+        *	@param textureFile texture file path
+        *	@param inputPosition initial position of the pigeon
+        *	@param inputRotation initial rotation of the pigeon
+        *	@param inputScale initial scale of the pigeon
+        *	@param inputAABBOffset the bounding box offsets
+	    *	@return 
+	    *	@pre 
+	    *	@post Camera will exist
+	    */
         public SkyBox(ContentManager Content, String modelFile, String textureFile,
                         Vector3 inputPosition, Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset)
         {

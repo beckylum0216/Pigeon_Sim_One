@@ -20,6 +20,16 @@ namespace AssignmentOne_Pigeon_Sim
         private int sizeY;
         private float plotScale;
 
+        /**
+	    *	@brief parameterised constructor to the PlotClient object. Create a complete PlotClient object.
+	    *	@param inputContent 
+        *	@param inputX grid size
+        *	@param inputY grid size
+        *	@param inputScale initial scale of the Plots
+	    *	@return 
+	    *	@pre 
+	    *	@post Camera will exist
+	    */
         public PlotClient(ContentManager inputContent,  int inputX, int inputY, float inputScale)
         {
             this.Content = inputContent;

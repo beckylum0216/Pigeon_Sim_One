@@ -18,9 +18,28 @@ namespace AssignmentOne_Pigeon_Sim
         private Vector3 zoomVector;
         private Quaternion deltaQuaternion;
 
+
+        /**
+	    *	@brief default constructor to the block object
+	    *	@param 
+	    *	@return 
+	    *	@pre 
+	    *	@post camera will exist
+	    */
         public Camera()
         { }
 
+        /**
+	    *	@brief parameterised constructor to the camera object. Create a comple camera object.
+	    *	@param inputCamera world camera
+        *	@param initPosition initial position of the camera
+        *	@param eyePosition initial eye position
+        *	@param deltaVector the "front" vector of the camera
+        *	@param inputOffset the bounding box offsets
+	    *	@return 
+	    *	@pre 
+	    *	@post Camera will exist
+	    */
         public Camera(Matrix inputCamera, Vector3 initPosition, Vector3 eyePosition, Vector3 deltaVector, Vector3 inputOffset)
         {
             this.theCamera = inputCamera;
@@ -35,6 +54,13 @@ namespace AssignmentOne_Pigeon_Sim
             zoomVector = new Vector3(0, 0, 0);
         }
 
+        /**
+	    *	@brief parameterised constructor to the camera object. Create a comple camera object.
+	    *	@param 
+	    *	@return 
+	    *	@pre 
+	    *	@post Camera will exist
+	    */
         public Camera(ContentManager Content, String modelFile, String textureFile, Vector3 predictedPosition, Vector3 inputPosition, 
                         Vector3 inputRotation, float inputScale, Vector3 inputAABBOffset, Camera inputCamera)
         {
@@ -232,9 +258,7 @@ namespace AssignmentOne_Pigeon_Sim
             this.maxPoint = this.subjectPosition + this.AABBOffset;
             this.minPoint = this.subjectPosition - this.AABBOffset;
         }
-
         
-
 
         /** 
         *   @brief This function implements the quaternion rotation. qpq'
